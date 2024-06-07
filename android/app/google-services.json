@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "379442482952",
+    "project_id": "nusatara-food",
+    "storage_bucket": "nusatara-food.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379442482952:android:a947792aafca24107f66bd",
+        "android_client_info": {
+          "package_name": "com.example.nusantara_food"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNA14UbrogU_o3dekw1pBh0X2OSnZqIIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
