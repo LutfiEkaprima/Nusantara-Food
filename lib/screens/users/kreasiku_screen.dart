@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 
-class Kreasiku extends StatelessWidget {
-
-  const Kreasiku({super.key});
+class KreasikuScreen extends StatelessWidget {
+  const KreasikuScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Kreasiku'),
-        ),
-        body: Center(
-          child: Text('Kreasiku'),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Kreasiku'),
+      ),
+      body: const Center(
+        child: Text('Kreasiku Screen'),
       ),
     );
   }

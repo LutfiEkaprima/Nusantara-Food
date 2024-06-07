@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'users/home_screen.dart';
+import 'package:nusantara_food/screens/users/botnav.dart';
 
 class Loginform extends StatelessWidget {
   final String? email;
@@ -129,7 +129,7 @@ class Loginform extends StatelessWidget {
                         if (credential.user != null) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => HomeScreen()),
+                            MaterialPageRoute(builder: (context) => const BottomNav(initialIndex: 0)),
                           );
                         }
                       } catch (e) {

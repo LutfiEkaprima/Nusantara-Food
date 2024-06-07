@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:nusantara_food/utils.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFED),
+      backgroundColor: const Color(0xFFFFFFED),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(180.0),
+        preferredSize: const Size.fromHeight(180.0),
         child: AppBar(
+          shadowColor: Colors.black,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15),
+            ),
+          ),
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color(0xFFFFFFED),
           flexibleSpace: Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 40.0),
             child: Column(
@@ -18,32 +27,27 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.account_circle, size: 50),
-                    SizedBox(width: 16.0),
+                    const Icon(Icons.account_circle, size: 50),
+                    const SizedBox(width: 16.0),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'HALO, USER',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: textStyle(14, Colors.black, FontWeight.bold),
                         ),
                         Text(
                           'Sudahkah Anda Memasak hari ini?',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
+                          style: textStyle(12, Colors.black, FontWeight.bold),
                         ),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 TextField(
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
                     hintText: 'Cari Resep',
                     filled: true,
                     fillColor: Colors.white,
@@ -59,35 +63,15 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
         child: ListView(
-          children: [
+          children: const [
             Section(title: 'MENU HARI INI'),
             Section(title: 'MENU SARAPAN'),
             Section(title: 'MENU MAKAN SIANG'),
             Section(title: 'MENU MAKAN MALAM'),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'HOME',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.create),
-            label: 'KREASIKU',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'RESEP',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'PROFILE',
-          ),
-        ],
       ),
     );
   }
@@ -96,34 +80,40 @@ class HomeScreen extends StatelessWidget {
 class Section extends StatelessWidget {
   final String title;
 
-  Section({required this.title});
+  const Section({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 16.0),
-        Text(
-          title,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(height: 8.0),
-        Container(
-          height: 150,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 150,
-                margin: EdgeInsets.only(right: 30.0),
-                color: Colors.grey[300],
-              );
-            },
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16.0),
+          Text(
+            title,
+            style: textStyle(18, Colors.black, FontWeight.bold),
           ),
-        ),
-      ],
+          const SizedBox(height: 8.0),
+          SizedBox(
+            height: 150,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  width: 150,
+                  margin: const EdgeInsets.only(right: 30.0),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
