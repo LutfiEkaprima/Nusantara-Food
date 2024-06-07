@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_screen.dart';
+import 'users/home_screen.dart';
 
 class Loginform extends StatelessWidget {
   final String? email;
   final String? password;
 
-  const Loginform({Key? key, this.email, this.password}) : super(key: key);
+  const Loginform({super.key, this.email, this.password});
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,7 @@ class Loginform extends StatelessWidget {
                         if (credential.user != null) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const HomeScreen()),
+                            MaterialPageRoute(builder: (context) => HomeScreen()),
                           );
                         }
                       } catch (e) {
