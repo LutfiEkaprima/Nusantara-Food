@@ -85,7 +85,7 @@ class Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
