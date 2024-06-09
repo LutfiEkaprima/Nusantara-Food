@@ -5,83 +5,81 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DaftarUser extends StatelessWidget {
   
-  DaftarUser({super.key});
+  const DaftarUser({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFED),
+      backgroundColor: const Color(0xFFFFFFED),
       resizeToAvoidBottomInset: true,
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 18),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 35.6, 0),
-                                child: Text(
-                                  'Kembali',
-                                  style: GoogleFonts.getFont(
-                                    'Inter',
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                    color: Color(0xFF035444),
-                                  ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0, 0, 0, 18),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 35.6, 0),
+                              child: Text(
+                                'Kembali',
+                                style: GoogleFonts.getFont(
+                                  'Inter',
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 16,
+                                  color: Color(0xFF035444),
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.fromLTRB(0, 50, 100, 0),
-                                child: Image.asset(
-                                  'assets/icons/Icon.png',
-                                  width: 116,
-                                  height: 116,
-                                  fit: BoxFit.contain,
-                                ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.fromLTRB(0, 50, 100, 0),
+                              child: Image.asset(
+                                'assets/icons/Icon.png',
+                                width: 116,
+                                height: 116,
+                                fit: BoxFit.contain,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 1, 25),
-                      child: Text(
-                        'Mohon Mengisi data berikut untuk proses pendaftaran',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.getFont(
-                          'Inter',
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          color: Color(0xFF035444),
-                        ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(0, 0, 1, 25),
+                    child: Text(
+                      'Mohon Mengisi data berikut untuk proses pendaftaran',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.getFont(
+                        'Inter',
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: Color(0xFF035444),
                       ),
                     ),
-                    DaftarForm(),
-                  ],
-                ),
+                  ),
+                  DaftarForm(),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

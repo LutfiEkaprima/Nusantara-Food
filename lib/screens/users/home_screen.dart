@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -101,13 +102,21 @@ class Section extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: 10,
               itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8.0),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewResep()),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    width: 150,
+                    margin: const EdgeInsets.only(right: 30.0),
                   ),
-                  width: 150,
-                  margin: const EdgeInsets.only(right: 30.0),
                 );
               },
             ),
