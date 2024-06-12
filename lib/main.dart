@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:nusantara_food/firebase_options.dart';
 import 'package:nusantara_food/screens/loginmenu.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
+import 'package:nusantara_food/screens/reset_password.dart'; // Import ResetPasswordPage
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   runApp(const MyApp());
 }
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       home: const LoginPage(),
       routes: {
         '/bottomnav': (context) => const BottomNav(initialIndex: 0),
+        '/reset_password': (context) => ResetPasswordPage(),
       },
     );
   }

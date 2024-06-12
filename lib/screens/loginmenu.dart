@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nusantara_food/screens/daftar.dart';
+import 'package:nusantara_food/utils.dart';
 import 'loginform.dart';
 
 class LoginPage extends StatelessWidget {
@@ -32,11 +32,7 @@ class LoginPage extends StatelessWidget {
               Text(
                 'SELAMAT DATANG DI NUSANTARA FOOD',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                  color: const Color(0xFF035444),
-                ),
+                style: textStyle(16, Color(0xFF035444), FontWeight.w800),
               ),
               const SizedBox(height: 47),
               SizedBox(
@@ -61,11 +57,7 @@ class LoginPage extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             'MASUK',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
-                              color: const Color(0xFFFFFFFF),
-                            ),
+                            style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                           ),
                         ),
                       ),
@@ -87,11 +79,7 @@ class LoginPage extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             'DAFTAR',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
-                              color: const Color(0xFFFFFFFF),
-                            ),
+                            style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                           ),
                         ),
                       ),
@@ -103,20 +91,11 @@ class LoginPage extends StatelessWidget {
               RichText(
                 text: TextSpan(
                   text: 'Masuk sebagai ',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                    color: const Color(0xFF035444),
-                  ),
+                  style: textStyle(14, Color(0xFF035444), FontWeight.w800),
                   children: [
                     TextSpan(
                       text: 'Tamu',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
-                        color: const Color(0xFF035444),
-                        decoration: TextDecoration.underline,
-                      ),
+                     style: textStyle(14, Color(0xFF035444), FontWeight.w800),
                     ),
                   ],
                 ),

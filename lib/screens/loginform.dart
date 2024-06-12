@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nusantara_food/screens/reset_password.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
+import 'package:nusantara_food/utils.dart';
 
 class Loginform extends StatefulWidget {
   final String? email;
@@ -18,6 +19,8 @@ class _LoginformState extends State<Loginform> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  String _emailError = '';
+  String _passwordError = '';
 
   @override
   void initState() {
@@ -26,7 +29,52 @@ class _LoginformState extends State<Loginform> {
     _passwordController.text = widget.password ?? '';
   }
 
+  void _showDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (title == 'Berhasil') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BottomNav(initialIndex: 0)),
+                  );
+                }
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _login() async {
+    setState(() {
+      _emailError = '';
+      _passwordError = '';
+    });
+
+    if (_emailController.text.isEmpty) {
+      setState(() {
+        _emailError = 'Email tidak boleh kosong';
+      });
+      return;
+    }
+
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _passwordError = 'Password tidak boleh kosong';
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -37,18 +85,39 @@ class _LoginformState extends State<Loginform> {
         password: _passwordController.text,
       );
       if (credential.user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const BottomNav(initialIndex: 0)),
-        );
+        _showDialog('Berhasil', 'Login berhasil!');
       }
     } catch (e) {
-      print('Login failed: $e');
+      String errorMessage = 'Login gagal: ';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'Email tidak terdaftar';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Password salah';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Email tidak valid';
+            break;
+          default:
+            errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+            break;
+        }
+      }
+      _showDialog('Gagal', errorMessage);
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  void _navigateToResetPassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+    );
   }
 
   @override
@@ -84,11 +153,7 @@ class _LoginformState extends State<Loginform> {
                             margin: EdgeInsets.fromLTRB(0, 0, 35.6, 115),
                             child: Text(
                               'Kembali',
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
-                                color: Color(0xFF035444),
-                              ),
+                              style: textStyle(16, Color(0xFF035444), FontWeight.w800)
                             ),
                           ),
                         ),
@@ -106,11 +171,7 @@ class _LoginformState extends State<Loginform> {
                 ),
                 Text(
                   'Selamat Datang',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                    color: Color(0xFF035444),
-                  ),
+                  style: textStyle(16, Color(0xFF035444), FontWeight.w800),
                 ),
                 SizedBox(height: 43),
                 Column(
@@ -119,11 +180,7 @@ class _LoginformState extends State<Loginform> {
                   children: [
                     Text(
                       'Email',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                        color: Color(0xFF035444),
-                      ),
+                      style: textStyle(15, Color(0xFF035444), FontWeight.w800),
                     ),
                     SizedBox(height: 8),
                     TextFormField(
@@ -135,16 +192,13 @@ class _LoginformState extends State<Loginform> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
+                        errorText: _emailError.isNotEmpty ? _emailError : null,
                       ),
                     ),
                     SizedBox(height: 18),
                     Text(
                       'Password',
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                        color: Color(0xFF035444),
-                      ),
+                      style: textStyle(15, Color(0xFF035444), FontWeight.w800),
                     ),
                     SizedBox(height: 8),
                     TextFormField(
@@ -157,6 +211,7 @@ class _LoginformState extends State<Loginform> {
                         ),
                         filled: true,
                         fillColor: Colors.white,
+                        errorText: _passwordError.isNotEmpty ? _passwordError : null,
                       ),
                     ),
                     SizedBox(height: 42),
@@ -172,12 +227,16 @@ class _LoginformState extends State<Loginform> {
                       child: Center(
                         child: Text(
                           'Masuk',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16,
-                            color: Color(0xFFFFFFFF),
-                          ),
+                          style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                         ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextButton(
+                      onPressed: _navigateToResetPassword,
+                      child: Text(
+                        'Lupa Password?',
+                        style: textStyle(14, Color(0xFF035444), FontWeight.w600),
                       ),
                     ),
                   ],

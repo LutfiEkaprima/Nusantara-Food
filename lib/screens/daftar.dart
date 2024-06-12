@@ -1,85 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nusantara_food/utils.dart';
+import 'package:nusantara_food/widgets/loadingstate.dart';
+import 'loginform.dart'; 
 
-class DaftarUser extends StatelessWidget {
-  
+class DaftarUser extends StatefulWidget {
   const DaftarUser({super.key});
+
+  @override
+  _DaftarUserState createState() => _DaftarUserState();
+}
+
+class _DaftarUserState extends State<DaftarUser> {
+  bool _isLoading = false;
+
+  void setLoading(bool isLoading) {
+    setState(() {
+      _isLoading = isLoading;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFED),
       resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 18),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 35.6, 0),
-                              child: Text(
-                                'Kembali',
-                                style: GoogleFonts.getFont(
-                                  'Inter',
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16,
-                                  color: Color(0xFF035444),
+      body: LoadingState(
+        isLoading: _isLoading,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 18),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 35.6, 0),
+                                child: Text(
+                                  'Kembali',
+                                  style: textStyle(16, Color(0xFF035444), FontWeight.w800),
                                 ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              alignment: Alignment.center,
-                              margin: EdgeInsets.fromLTRB(0, 50, 100, 0),
-                              child: Image.asset(
-                                'assets/icons/Icon.png',
-                                width: 116,
-                                height: 116,
-                                fit: BoxFit.contain,
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.fromLTRB(0, 50, 100, 0),
+                                child: Image.asset(
+                                  'assets/icons/Icon.png',
+                                  width: 116,
+                                  height: 116,
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(0, 0, 1, 25),
-                    child: Text(
-                      'Mohon Mengisi data berikut untuk proses pendaftaran',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.getFont(
-                        'Inter',
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        color: Color(0xFF035444),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 1, 25),
+                      child: Text(
+                        'Mohon mengisi data berikut untuk proses pendaftaran',
+                        textAlign: TextAlign.center,
+                        style: textStyle(16, Color(0xFF035444), FontWeight.w800),
                       ),
                     ),
-                  ),
-                  DaftarForm(),
-                ],
+                    DaftarForm(setLoading: setLoading),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -87,6 +94,10 @@ class DaftarUser extends StatelessWidget {
 }
 
 class DaftarForm extends StatefulWidget {
+  final Function(bool) setLoading;
+
+  const DaftarForm({super.key, required this.setLoading});
+
   @override
   _DaftarFormState createState() => _DaftarFormState();
 }
@@ -112,65 +123,64 @@ class _DaftarFormState extends State<DaftarForm> {
           _buildTextField(_konfirmasiPasswordController, 'Masukkan Password kembali', obscureText: true),
           Container(
             width: double.infinity,
-            margin: EdgeInsets.fromLTRB(18, 28, 18, 0),
+            margin: const EdgeInsets.fromLTRB(18, 28, 18, 0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF035444),
-                padding: EdgeInsets.symmetric(vertical: 14),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  // Memastikan kedua password cocok
                   if (_passwordController.text != _konfirmasiPasswordController.text) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Password tidak cocok'),
                       ),
                     );
                     return;
                   }
 
+                  widget.setLoading(true);
+
                   try {
-                    // Membuat pengguna menggunakan Firebase Authentication
                     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
                       email: _emailController.text,
                       password: _passwordController.text,
                     );
 
-                    // Menyimpan data pengguna ke Cloud Firestore
                     await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
                       'nama': _namaController.text,
                       'email': _emailController.text,
                     });
 
-                    // Berhasil mendaftar, navigasi ke halaman berikutnya atau tampilkan pesan sukses
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('Pendaftaran berhasil'),
                       ),
                     );
 
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Loginform()),
+                    );
+
                   } on FirebaseAuthException catch (e) {
-                    // Menangani kesalahan saat pendaftaran
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Pendaftaran gagal: ${e.message}'),
                       ),
                     );
+                  } finally {
+                    widget.setLoading(false);
                   }
                 }
               },
               child: Text(
                 'DAFTAR',
-                style: GoogleFonts.getFont(
-                  'Inter',
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                  color: Color(0xFFFFFFFF),
-                ),
+                style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
               ),
             ),
           ),
@@ -187,12 +197,7 @@ class _DaftarFormState extends State<DaftarForm> {
         children: [
           Text(
             labelText,
-            style: GoogleFonts.getFont(
-              'Inter',
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-              color: Color(0xFF035444),
-            ),
+            style: textStyle(14, Color(0xFF035444), FontWeight.w800),
           ),
           SizedBox(height: 9),
           TextFormField(
