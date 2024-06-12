@@ -1,6 +1,122 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
-class TambahResep extends StatelessWidget {
+class TambahResep extends StatefulWidget {
+  @override
+  _TambahResepState createState() => _TambahResepState();
+}
+
+class _TambahResepState extends State<TambahResep> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final ImagePicker _picker = ImagePicker();
+
+  List<TextEditingController> _ingredientControllers = [];
+  List<TextEditingController> _stepControllers = [];
+  List<TextEditingController> _toolControllers = [];
+  List<TextEditingController> _categoryControllers = [];
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _portionController = TextEditingController();
+  TextEditingController _costController = TextEditingController();
+  TextEditingController _timeController = TextEditingController();
+  XFile? _image;
+  bool _isFood = false;
+  bool _isDrink = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ingredientControllers.add(TextEditingController());
+    _stepControllers.add(TextEditingController());
+    _toolControllers.add(TextEditingController());
+    _categoryControllers.add(TextEditingController());
+  }
+
+  @override
+  void dispose() {
+    _ingredientControllers.forEach((controller) => controller.dispose());
+    _stepControllers.forEach((controller) => controller.dispose());
+    _toolControllers.forEach((controller) => controller.dispose());
+    _categoryControllers.forEach((controller) => controller.dispose());
+    _titleController.dispose();
+    _portionController.dispose();
+    _costController.dispose();
+    _timeController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveResep(String status) async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        return;
+      }
+
+      // Upload image if selected
+      String? imageUrl;
+      if (_image != null) {
+        imageUrl = await _uploadImageToStorage(_image!);
+      }
+
+      final docRef = await _firestore.collection('resep').add({
+        'userId': user.uid,
+        'title': _titleController.text,
+        'portion': _portionController.text,
+        'cost': _costController.text,
+        'time': _timeController.text,
+        'isFood': _isFood,
+        'isDrink': _isDrink,
+        'ingredients': _ingredientControllers.map((e) => e.text).toList(),
+        'steps': _stepControllers.map((e) => e.text).toList(),
+        'tools': _toolControllers.map((e) => e.text).toList(),
+        'categories': _categoryControllers.map((e) => e.text).toList(),
+        'status': status,
+        'createdAt': FieldValue.serverTimestamp(), // Use FieldValue here
+        'imageUrl': imageUrl,
+      });
+
+      // Handle successful save
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Resep berhasil disimpan sebagai $status')),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      // Handle errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan resep: $e')),
+      );
+    }
+  }
+
+  Future<String> _uploadImageToStorage(XFile image) async {
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('recipe_images')
+        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final uploadTask = storageRef.putFile(File(image.path));
+    final snapshot = await uploadTask.whenComplete(() => null);
+    return await snapshot.ref.getDownloadURL();
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = pickedFile;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,41 +131,54 @@ class TambahResep extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionTitle('Judul Resep'),
-            _buildTextField('Tulis judul resepmu secara ringkas'),
+            _buildTextField('Tulis judul resepmu secara ringkas',
+                controller: _titleController),
             SizedBox(height: 16.0),
             _buildSectionTitle('Foto Resep'),
             _buildImagePicker(),
             SizedBox(height: 16.0),
             Row(
               children: [
-                Expanded(child: _buildTextField('Porsi Resep')),
+                Expanded(
+                    child: _buildTextField('Porsi Resep',
+                        controller: _portionController)),
                 SizedBox(width: 16.0),
-                Expanded(child: _buildTextField('Estimasi Pengeluaran')),
+                Expanded(
+                    child: _buildTextField('Estimasi Pengeluaran',
+                        controller: _costController)),
               ],
             ),
             SizedBox(height: 16.0),
-            _buildTextField('Waktu Memasak'),
+            _buildTextField('Waktu Memasak', controller: _timeController),
             SizedBox(height: 16.0),
             _buildSectionTitle('Jenis Makanan'),
             _buildFoodTypeSelection(),
             SizedBox(height: 16.0),
             _buildSectionTitle('Bahan Utama Resep'),
-            _buildIngredientFields(),
-            _buildAddButton('Tambah Bahan Utama'),
+            _buildReorderableIngredientFields(),
+            _buildAddButton('Tambah Bahan Utama', _addIngredientField),
+            SizedBox(height: 16.0),
+            _buildSectionTitle('Alat & Perlengkapan Memasak'),
+            _buildReorderableToolsFields(),
+            _buildAddButton('Tambah Alat & Perlengkapan', _addToolField),
             SizedBox(height: 16.0),
             _buildSectionTitle('Langkah - langkah memasak'),
-            _buildStepsFields(),
-            _buildAddButton('Tambah Langkah Memasak'),
+            _buildReorderableStepsFields(),
+            _buildAddButton('Tambah Langkah Memasak', _addStepField),
             SizedBox(height: 16.0),
-            _buildSectionTitle('Kategori Resep Masakanmu'),
-            _buildCategorySelection(),
-            SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildSaveButton('Simpan'),
-                _buildUploadButton('Upload'),
-              ],
+            _buildSectionTitle('Kategori Resep'),
+            _buildReorderableCategoryFields(),
+            _buildAddButton('Tambah Kategori', _addCategoryField),
+            SizedBox(height: 30.0),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSaveButton('Simpan', () => _saveResep('draft')),
+                  SizedBox(width: 16.0),
+                  _buildUploadButton('Upload', () => _saveResep('ditinjau')),
+                ],
+              ),
             ),
           ],
         ),
@@ -60,28 +189,39 @@ class TambahResep extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 20.0,
+        color: Colors.black,
+      ),
     );
   }
 
-  Widget _buildTextField(String hint) {
+  Widget _buildTextField(String hint, {TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: hint,
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
       ),
     );
   }
 
   Widget _buildImagePicker() {
-    return Container(
-      height: 100.0,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(5.0),
-      ),
-      child: Center(
-        child: Icon(Icons.image, size: 50.0),
+    return GestureDetector(
+      onTap: _pickImage,
+      child: Container(
+        width: double.infinity,
+        height: 200.0,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: _image == null
+            ? Icon(Icons.add_a_photo, size: 50.0)
+            : Image.file(File(_image!.path), fit: BoxFit.cover),
       ),
     );
   }
@@ -89,92 +229,272 @@ class TambahResep extends StatelessWidget {
   Widget _buildFoodTypeSelection() {
     return Row(
       children: [
-        Expanded(child: _buildCheckbox('Makanan')),
-        Expanded(child: _buildCheckbox('Minuman')),
+        Expanded(
+          child: CheckboxListTile(
+            title: Text('Makanan'),
+            value: _isFood,
+            onChanged: (bool? value) {
+              setState(() {
+                _isFood = value ?? false;
+              });
+            },
+          ),
+        ),
+        Expanded(
+          child: CheckboxListTile(
+            title: Text('Minuman'),
+            value: _isDrink,
+            onChanged: (bool? value) {
+              setState(() {
+                _isDrink = value ?? false;
+              });
+            },
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildCheckbox(String title) {
-    return Row(
-      children: [
-        Checkbox(value: false, onChanged: (value) {}),
-        Text(title),
-      ],
-    );
-  }
-
-  Widget _buildIngredientFields() {
-    return Column(
-      children: List.generate(3, (index) => _buildTextField('')),
-    );
-  }
-
-  Widget _buildStepsFields() {
-    return Column(
-      children: List.generate(5, (index) => _buildStepField(index + 1)),
-    );
-  }
-
-  Widget _buildStepField(int stepNumber) {
-    return Row(
-      children: [
-        Text('$stepNumber.'),
-        SizedBox(width: 8.0),
-        Expanded(child: _buildTextField('')),
-        SizedBox(width: 8.0),
-        Icon(Icons.image, size: 40.0),
-      ],
-    );
-  }
-
-  Widget _buildAddButton(String title) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {},
-        child: Text(title),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.redAccent,
+  Widget _buildAddButton(String title, VoidCallback onPressed) {
+    return TextButton(
+      onPressed: onPressed,
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16.0,
+          color: Colors.blue,
         ),
       ),
     );
   }
 
-  Widget _buildCategorySelection() {
-    return Wrap(
-      spacing: 8.0,
-      runSpacing: 8.0,
-      children: List.generate(6, (index) => _buildCategoryChip()),
-    );
-  }
-
-  Widget _buildCategoryChip() {
-    return FilterChip(
-      label: Text('Kategori'),
-      selected: false,
-      onSelected: (value) {},
-    );
-  }
-
-  Widget _buildSaveButton(String title) {
+  Widget _buildSaveButton(String title, VoidCallback onPressed) {
     return ElevatedButton(
-      onPressed: () {},
-      child: Text(title),
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
+        foregroundColor: Colors.white, 
         backgroundColor: Colors.grey,
-        minimumSize: Size(150, 50),
+        padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 18.0),
       ),
     );
   }
 
-  Widget _buildUploadButton(String title) {
+  Widget _buildUploadButton(String title, VoidCallback onPressed) {
     return ElevatedButton(
-      onPressed: () {},
-      child: Text(title),
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.pinkAccent,
-        minimumSize: Size(150, 50),
+        foregroundColor: Colors.white, 
+        backgroundColor: Colors.blue,
+        padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(fontSize: 18.0),
       ),
     );
+  }
+
+  Widget _buildReorderableIngredientFields() {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      onReorder: (int oldIndex, int newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        final item = _ingredientControllers.removeAt(oldIndex);
+        _ingredientControllers.insert(newIndex, item);
+      },
+      children: List.generate(_ingredientControllers.length, (index) {
+        return ListTile(
+          key: Key('$index'),
+          title: TextField(
+            controller: _ingredientControllers[index],
+            decoration: InputDecoration(
+              hintText: 'Bahan Utama ${index + 1}',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _removeIngredientField(index),
+              ),
+              Icon(Icons.drag_handle),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildReorderableStepsFields() {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      onReorder: (int oldIndex, int newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        final item = _stepControllers.removeAt(oldIndex);
+        _stepControllers.insert(newIndex, item);
+      },
+      children: List.generate(_stepControllers.length, (index) {
+        return ListTile(
+          key: Key('$index'),
+          title: TextField(
+            controller: _stepControllers[index],
+            decoration: InputDecoration(
+              hintText: 'Langkah ${index + 1}',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _removeStepField(index),
+              ),
+              Icon(Icons.drag_handle),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildReorderableToolsFields() {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      onReorder: (int oldIndex, int newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        final item = _toolControllers.removeAt(oldIndex);
+        _toolControllers.insert(newIndex, item);
+      },
+      children: List.generate(_toolControllers.length, (index) {
+        return ListTile(
+          key: Key('$index'),
+          title: TextField(
+            controller: _toolControllers[index],
+            decoration: InputDecoration(
+              hintText: 'Alat ${index + 1}',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _removeToolField(index),
+              ),
+              Icon(Icons.drag_handle),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildReorderableCategoryFields() {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      onReorder: (int oldIndex, int newIndex) {
+        if (newIndex > oldIndex) {
+          newIndex -= 1;
+        }
+        final item = _categoryControllers.removeAt(oldIndex);
+        _categoryControllers.insert(newIndex, item);
+      },
+      children: List.generate(_categoryControllers.length, (index) {
+        return ListTile(
+          key: Key('$index'),
+          title: TextField(
+            controller: _categoryControllers[index],
+            decoration: InputDecoration(
+              hintText: 'Kategori ${index + 1}',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _removeCategoryField(index),
+              ),
+              Icon(Icons.drag_handle),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  void _addIngredientField() {
+    setState(() {
+      _ingredientControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeIngredientField(int index) {
+    setState(() {
+      _ingredientControllers.removeAt(index);
+    });
+  }
+
+  void _addStepField() {
+    setState(() {
+      _stepControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeStepField(int index) {
+    setState(() {
+      _stepControllers.removeAt(index);
+    });
+  }
+
+  void _addToolField() {
+    setState(() {
+      _toolControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeToolField(int index) {
+    setState(() {
+      _toolControllers.removeAt(index);
+    });
+  }
+
+  void _addCategoryField() {
+    setState(() {
+      _categoryControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeCategoryField(int index) {
+    setState(() {
+      _categoryControllers.removeAt(index);
+    });
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DitolakView extends StatelessWidget {
-  const DitolakView({super.key});
+  DitolakView({super.key});
 
   @override
   Widget build(BuildContext context) {

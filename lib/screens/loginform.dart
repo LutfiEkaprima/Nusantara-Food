@@ -101,7 +101,7 @@ class _LoginformState extends State<Loginform> {
             errorMessage = 'Email tidak valid';
             break;
           default:
-            errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+            errorMessage = 'Password atau Email salah. Silakan coba lagi.';
             break;
         }
       }

@@ -32,7 +32,7 @@ class KreasikuScreen extends StatelessWidget {
             indicatorColor: Color.fromARGB(255, 255, 0, 0),
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
             DraftView(),
             DitinjauView(),
