@@ -91,12 +91,6 @@ class _LoginformState extends State<Loginform> {
       String errorMessage = 'Login gagal: ';
       if (e is FirebaseAuthException) {
         switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'Email tidak terdaftar';
-            break;
-          case 'wrong-password':
-            errorMessage = 'Password salah';
-            break;
           case 'invalid-email':
             errorMessage = 'Email tidak valid';
             break;

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nusantara_food/firebase_options.dart';
 import 'package:nusantara_food/screens/loginmenu.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
-import 'package:nusantara_food/screens/reset_password.dart'; // Import ResetPasswordPage
+import 'package:nusantara_food/screens/reset_password.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

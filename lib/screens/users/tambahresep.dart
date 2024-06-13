@@ -23,6 +23,7 @@ class _TambahResepState extends State<TambahResep> {
   TextEditingController _portionController = TextEditingController();
   TextEditingController _costController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
+  List<String?> _stepImages = [];
   XFile? _image;
   bool _isFood = false;
   bool _isDrink = false;
@@ -74,8 +75,9 @@ class _TambahResepState extends State<TambahResep> {
         'steps': _stepControllers.map((e) => e.text).toList(),
         'tools': _toolControllers.map((e) => e.text).toList(),
         'categories': _categoryControllers.map((e) => e.text).toList(),
+        'stepImages': _stepImages, // Tambahkan ini
         'status': status,
-        'createdAt': FieldValue.serverTimestamp(), // Use FieldValue here
+        'createdAt': FieldValue.serverTimestamp(),
         'imageUrl': imageUrl,
       });
 
@@ -109,6 +111,25 @@ class _TambahResepState extends State<TambahResep> {
     if (pickedFile != null) {
       setState(() {
         _image = pickedFile;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
+      );
+    }
+  }
+
+  Future<void> _pickStepImage(int index) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      String imageUrl = await _uploadImageToStorage(pickedFile);
+      setState(() {
+        if (index < _stepImages.length) {
+          _stepImages[index] = imageUrl;
+        } else {
+          _stepImages.add(imageUrl);
+        }
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -272,7 +293,7 @@ class _TambahResepState extends State<TambahResep> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white, 
+        foregroundColor: Colors.white,
         backgroundColor: Colors.grey,
         padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
       ),
@@ -287,7 +308,7 @@ class _TambahResepState extends State<TambahResep> {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white, 
+        foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
         padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
       ),
@@ -346,6 +367,9 @@ class _TambahResepState extends State<TambahResep> {
         }
         final item = _stepControllers.removeAt(oldIndex);
         _stepControllers.insert(newIndex, item);
+
+        final image = _stepImages.removeAt(oldIndex);
+        _stepImages.insert(newIndex, image);
       },
       children: List.generate(_stepControllers.length, (index) {
         return ListTile(
@@ -362,6 +386,16 @@ class _TambahResepState extends State<TambahResep> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              IconButton(
+                icon: Icon(Icons.photo),
+                onPressed: () => _pickStepImage(index),
+              ),
+              if (_stepImages.length > index && _stepImages[index] != null)
+                Image.network(
+                  _stepImages[index]!,
+                  width: 50,
+                  height: 50,
+                ),
               IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () => _removeStepField(index),
@@ -465,12 +499,14 @@ class _TambahResepState extends State<TambahResep> {
   void _addStepField() {
     setState(() {
       _stepControllers.add(TextEditingController());
+      _stepImages.add(null);
     });
   }
 
   void _removeStepField(int index) {
     setState(() {
       _stepControllers.removeAt(index);
+      _stepImages.removeAt(index);
     });
   }
 
