@@ -32,13 +32,13 @@ class _DaftarUserState extends State<DaftarUser> {
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
+                padding: const EdgeInsets.fromLTRB(22.6, 22, 22.6, 61),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 18),
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 18),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Row(
@@ -50,17 +50,17 @@ class _DaftarUserState extends State<DaftarUser> {
                                 Navigator.pop(context);
                               },
                               child: Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 35.6, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 0, 35.6, 0),
                                 child: Text(
                                   'Kembali',
-                                  style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                                  style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                                 ),
                               ),
                             ),
                             Expanded(
                               child: Container(
                                 alignment: Alignment.center,
-                                margin: EdgeInsets.fromLTRB(0, 50, 100, 0),
+                                margin: const EdgeInsets.fromLTRB(0, 50, 100, 0),
                                 child: Image.asset(
                                   'assets/icons/Icon.png',
                                   width: 116,
@@ -74,11 +74,11 @@ class _DaftarUserState extends State<DaftarUser> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 1, 25),
+                      margin: const EdgeInsets.fromLTRB(0, 0, 1, 25),
                       child: Text(
                         'Mohon mengisi data berikut untuk proses pendaftaran',
                         textAlign: TextAlign.center,
-                        style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                        style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                       ),
                     ),
                     DaftarForm(setLoading: setLoading),
@@ -126,7 +126,7 @@ class _DaftarFormState extends State<DaftarForm> {
             margin: const EdgeInsets.fromLTRB(18, 28, 18, 0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF035444),
+                backgroundColor: const Color(0xFF035444),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
@@ -164,7 +164,7 @@ class _DaftarFormState extends State<DaftarForm> {
 
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => Loginform()),
+                      MaterialPageRoute(builder: (context) => const Loginform()),
                     );
 
                   } on FirebaseAuthException catch (e) {
@@ -180,7 +180,7 @@ class _DaftarFormState extends State<DaftarForm> {
               },
               child: Text(
                 'DAFTAR',
-                style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
               ),
             ),
           ),
@@ -191,25 +191,25 @@ class _DaftarFormState extends State<DaftarForm> {
 
   Widget _buildTextField(TextEditingController controller, String labelText, {bool obscureText = false}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             labelText,
-            style: textStyle(14, Color(0xFF035444), FontWeight.w800),
+            style: textStyle(14, const Color(0xFF035444), FontWeight.w800),
           ),
-          SizedBox(height: 9),
+          const SizedBox(height: 9),
           TextFormField(
             controller: controller,
             obscureText: obscureText,
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
               filled: true,
-              fillColor: Color(0xFFFFFFFF),
+              fillColor: const Color(0xFFFFFFFF),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {

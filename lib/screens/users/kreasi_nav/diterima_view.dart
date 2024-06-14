@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class DiterimaView extends StatelessWidget {
-  DiterimaView({super.key});
+  const DiterimaView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('DITERIMA View'),
     );
   }

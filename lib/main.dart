@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const LoginPage(),
       routes: {
-        '/bottomnav': (context) => BottomNav(initialIndex: 0, userName: ''),
-        '/reset_password': (context) => ResetPasswordPage(),
+        '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),
+        '/reset_password': (context) => const ResetPasswordPage(),
       },
     );
   }

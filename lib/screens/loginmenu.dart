@@ -32,7 +32,7 @@ class LoginPage extends StatelessWidget {
               Text(
                 'SELAMAT DATANG DI NUSANTARA FOOD',
                 textAlign: TextAlign.center,
-                style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
               ),
               const SizedBox(height: 47),
               SizedBox(
@@ -49,7 +49,7 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Loginform()),
+                            MaterialPageRoute(builder: (context) => const Loginform()),
                           );
                         },
                         child: Container(
@@ -57,7 +57,7 @@ class LoginPage extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             'MASUK',
-                            style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                            style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                           ),
                         ),
                       ),
@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) =>  DaftarUser()),
+                            MaterialPageRoute(builder: (context) =>  const DaftarUser()),
                           );
                         },
                         child: Container(
@@ -79,7 +79,7 @@ class LoginPage extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             'DAFTAR',
-                            style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                            style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                           ),
                         ),
                       ),
@@ -91,11 +91,11 @@ class LoginPage extends StatelessWidget {
               RichText(
                 text: TextSpan(
                   text: 'Masuk sebagai ',
-                  style: textStyle(14, Color(0xFF035444), FontWeight.w800),
+                  style: textStyle(14, const Color(0xFF035444), FontWeight.w800),
                   children: [
                     TextSpan(
                       text: 'Tamu',
-                     style: textStyle(14, Color(0xFF035444), FontWeight.w800),
+                     style: textStyle(14, const Color(0xFF035444), FontWeight.w800),
                     ),
                   ],
                 ),

@@ -26,11 +26,11 @@ class DraftView extends StatelessWidget {
         future: _fetchDrafts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No drafts available'));
+            return const Center(child: Text('No drafts available'));
           }
 
           final List<DocumentSnapshot> documents = snapshot.data!.docs;

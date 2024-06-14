@@ -111,7 +111,7 @@ class _TambahResepState extends State<TambahResep> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
+        const SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
       );
     }
   }
@@ -130,7 +130,7 @@ class _TambahResepState extends State<TambahResep> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
+        const SnackBar(content: Text('Tidak ada gambar yang dipilih.')),
       );
     }
   }
@@ -141,59 +141,59 @@ class _TambahResepState extends State<TambahResep> {
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFED),
-        title: Text('TAMBAHKAN RESEP MAKANAN'),
+        title: const Text('TAMBAHKAN RESEP MAKANAN'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionTitle('Judul Resep'),
             _buildTextField('Tulis judul resepmu secara ringkas',
                 controller: _titleController),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Foto Resep'),
             _buildImagePicker(),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               children: [
                 Expanded(
                     child: _buildTextField('Porsi Resep',
                         controller: _portionController)),
-                SizedBox(width: 16.0),
+                const SizedBox(width: 16.0),
                 Expanded(
                     child: _buildTextField('Estimasi Pengeluaran',
                         controller: _costController)),
               ],
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildTextField('Waktu Memasak', controller: _timeController),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Jenis Makanan'),
             _buildFoodTypeSelection(),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Bahan Utama Resep'),
             _buildReorderableIngredientFields(),
             _buildAddButton('Tambah Bahan Utama', _addIngredientField),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Alat & Perlengkapan Memasak'),
             _buildReorderableToolsFields(),
             _buildAddButton('Tambah Alat & Perlengkapan', _addToolField),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Langkah - langkah memasak'),
             _buildReorderableStepsFields(),
             _buildAddButton('Tambah Langkah Memasak', _addStepField),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             _buildSectionTitle('Kategori Resep'),
             _buildReorderableCategoryFields(),
             _buildAddButton('Tambah Kategori', _addCategoryField),
-            SizedBox(height: 30.0),
+            const SizedBox(height: 30.0),
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildSaveButton('Simpan', () => _saveResep('draft')),
-                  SizedBox(width: 16.0),
+                  const SizedBox(width: 16.0),
                   _buildUploadButton('Upload', () => _saveResep('ditinjau')),
                 ],
               ),
@@ -207,7 +207,7 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 20.0,
         color: Colors.black,
@@ -238,7 +238,7 @@ class _TambahResepState extends State<TambahResep> {
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: _image == null
-            ? Icon(Icons.add_a_photo, size: 50.0)
+            ? const Icon(Icons.add_a_photo, size: 50.0)
             : Image.file(File(_image!.path), fit: BoxFit.cover),
       ),
     );
@@ -249,7 +249,7 @@ class _TambahResepState extends State<TambahResep> {
       children: [
         Expanded(
           child: CheckboxListTile(
-            title: Text('Makanan'),
+            title: const Text('Makanan'),
             value: _isFood,
             onChanged: (bool? value) {
               setState(() {
@@ -260,7 +260,7 @@ class _TambahResepState extends State<TambahResep> {
         ),
         Expanded(
           child: CheckboxListTile(
-            title: Text('Minuman'),
+            title: const Text('Minuman'),
             value: _isDrink,
             onChanged: (bool? value) {
               setState(() {
@@ -278,7 +278,7 @@ class _TambahResepState extends State<TambahResep> {
       onPressed: onPressed,
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 16.0,
           color: Colors.blue,
         ),
@@ -292,11 +292,11 @@ class _TambahResepState extends State<TambahResep> {
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.grey,
-        padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
       ),
       child: Text(
         title,
-        style: TextStyle(fontSize: 18.0),
+        style: const TextStyle(fontSize: 18.0),
       ),
     );
   }
@@ -307,11 +307,11 @@ class _TambahResepState extends State<TambahResep> {
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
-        padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
       ),
       child: Text(
         title,
-        style: TextStyle(fontSize: 18.0),
+        style: const TextStyle(fontSize: 18.0),
       ),
     );
   }
@@ -319,7 +319,7 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildReorderableIngredientFields() {
     return ReorderableListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onReorder: (int oldIndex, int newIndex) {
         if (newIndex > oldIndex) {
           newIndex -= 1;
@@ -343,10 +343,10 @@ class _TambahResepState extends State<TambahResep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () => _removeIngredientField(index),
               ),
-              Icon(Icons.drag_handle),
+              const Icon(Icons.drag_handle),
             ],
           ),
         );
@@ -357,7 +357,7 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildReorderableStepsFields() {
     return ReorderableListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onReorder: (int oldIndex, int newIndex) {
         if (newIndex > oldIndex) {
           newIndex -= 1;
@@ -384,7 +384,7 @@ class _TambahResepState extends State<TambahResep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.photo),
+                icon: const Icon(Icons.photo),
                 onPressed: () => _pickStepImage(index),
               ),
               if (_stepImages.length > index && _stepImages[index] != null)
@@ -394,10 +394,10 @@ class _TambahResepState extends State<TambahResep> {
                   height: 50,
                 ),
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () => _removeStepField(index),
               ),
-              Icon(Icons.drag_handle),
+              const Icon(Icons.drag_handle),
             ],
           ),
         );
@@ -408,7 +408,7 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildReorderableToolsFields() {
     return ReorderableListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onReorder: (int oldIndex, int newIndex) {
         if (newIndex > oldIndex) {
           newIndex -= 1;
@@ -432,10 +432,10 @@ class _TambahResepState extends State<TambahResep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () => _removeToolField(index),
               ),
-              Icon(Icons.drag_handle),
+              const Icon(Icons.drag_handle),
             ],
           ),
         );
@@ -446,7 +446,7 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildReorderableCategoryFields() {
     return ReorderableListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onReorder: (int oldIndex, int newIndex) {
         if (newIndex > oldIndex) {
           newIndex -= 1;
@@ -470,10 +470,10 @@ class _TambahResepState extends State<TambahResep> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () => _removeCategoryField(index),
               ),
-              Icon(Icons.drag_handle),
+              const Icon(Icons.drag_handle),
             ],
           ),
         );

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class RevisiView extends StatelessWidget {
-  RevisiView({super.key});
+  const RevisiView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('REVISI View'),
     );
   }

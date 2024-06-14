@@ -50,7 +50,7 @@ class _LoginformState extends State<Loginform> {
                   );
                 }
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -131,17 +131,17 @@ class _LoginformState extends State<Loginform> {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Color(0xFFFFFFED),
           ),
           child: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(22.6, 22, 22.6, 111),
+            padding: const EdgeInsets.fromLTRB(22.6, 22, 22.6, 111),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Row(
@@ -153,15 +153,15 @@ class _LoginformState extends State<Loginform> {
                             Navigator.pop(context);
                           },
                           child: Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 35.6, 115),
+                            margin: const EdgeInsets.fromLTRB(0, 0, 35.6, 115),
                             child: Text(
                               'Kembali',
-                              style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                              style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                             ),
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.fromLTRB(45, 50, 0, 0),
+                          margin: const EdgeInsets.fromLTRB(45, 50, 0, 0),
                           child: Image.asset(
                             'assets/icons/Icon.png',
                             width: 116,
@@ -174,22 +174,22 @@ class _LoginformState extends State<Loginform> {
                 ),
                 Text(
                   'Selamat Datang',
-                  style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                  style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                 ),
-                SizedBox(height: 43),
+                const SizedBox(height: 43),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Email',
-                      style: textStyle(15, Color(0xFF035444), FontWeight.w800),
+                      style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -198,17 +198,17 @@ class _LoginformState extends State<Loginform> {
                         errorText: _emailError.isNotEmpty ? _emailError : null,
                       ),
                     ),
-                    SizedBox(height: 18),
+                    const SizedBox(height: 18),
                     Text(
                       'Password',
-                      style: textStyle(15, Color(0xFF035444), FontWeight.w800),
+                      style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -217,29 +217,29 @@ class _LoginformState extends State<Loginform> {
                         errorText: _passwordError.isNotEmpty ? _passwordError : null,
                       ),
                     ),
-                    SizedBox(height: 42),
+                    const SizedBox(height: 42),
                     ElevatedButton(
                       onPressed: _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF035444),
+                        backgroundColor: const Color(0xFF035444),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 10),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
                       child: Center(
                         child: Text(
                           'Masuk',
-                          style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                          style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextButton(
                       onPressed: _navigateToResetPassword,
                       child: Text(
                         'Lupa Password?',
-                        style: textStyle(14, Color(0xFF035444), FontWeight.w600),
+                        style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
                       ),
                     ),
                   ],

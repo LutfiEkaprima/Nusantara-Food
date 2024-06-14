@@ -4,6 +4,8 @@ import 'package:nusantara_food/widgets/loadingstate.dart';
 import 'package:nusantara_food/utils.dart';
 
 class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({super.key});
+
   @override
   _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
@@ -19,14 +21,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Password reset email sent.'),
         backgroundColor: Colors.green,
       ));
       Navigator.pop(context); // Kembali ke halaman login
     } catch (e) {
       print('Failed to send password reset email: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Failed to send password reset email.'),
         backgroundColor: Colors.red,
       ));
@@ -42,7 +44,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
-        title: Text('Reset Password'),
+        title: const Text('Reset Password'),
         backgroundColor: const Color(0xFFFFFFED),
       ),
       body: LoadingState(
@@ -55,14 +57,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             children: [
               Text(
                 'Masukkan Email Anda untuk Reset Password',
-                style: textStyle(16, Color(0xFF035444), FontWeight.w800),
+                style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -70,20 +72,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   fillColor: Colors.white,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _sendPasswordResetEmail,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF035444),
+                  backgroundColor: const Color(0xFF035444),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                 ),
                 child: Center(
                   child: Text(
                     'Send Reset Email',
-                    style: textStyle(16, Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                    style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                   ),
                 ),
               ),

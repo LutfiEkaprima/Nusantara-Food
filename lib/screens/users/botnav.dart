@@ -27,7 +27,7 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _screens = [
+    final List<Widget> screens = [
       HomeScreen(userName: widget.userName),
       const KreasikuScreen(),
       const ResepScreen(),
@@ -35,7 +35,7 @@ class _BottomNavState extends State<BottomNav> {
     ];
 
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
         backgroundColor: Colors.transparent,
         color: Colors.white,

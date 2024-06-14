@@ -48,8 +48,8 @@ class KreasikuScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => TambahResep()),
           );
           },
-          child: const Icon(Icons.add),
           backgroundColor: Colors.green,
+          child: const Icon(Icons.add),
         ),
       ),
     );
