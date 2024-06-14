@@ -3,7 +3,9 @@ import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final String userName;
+
+  const HomeScreen({super.key, required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class HomeScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'HALO, USER',
+                          'Halo, $userName',
                           style: textStyle(14, Colors.black, FontWeight.bold),
                         ),
                         Text(

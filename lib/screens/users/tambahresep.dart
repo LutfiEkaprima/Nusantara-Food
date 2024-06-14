@@ -57,7 +57,6 @@ class _TambahResepState extends State<TambahResep> {
         return;
       }
 
-      // Upload image if selected
       String? imageUrl;
       if (_image != null) {
         imageUrl = await _uploadImageToStorage(_image!);
@@ -75,20 +74,18 @@ class _TambahResepState extends State<TambahResep> {
         'steps': _stepControllers.map((e) => e.text).toList(),
         'tools': _toolControllers.map((e) => e.text).toList(),
         'categories': _categoryControllers.map((e) => e.text).toList(),
-        'stepImages': _stepImages, // Tambahkan ini
+        'stepImages': _stepImages,
         'status': status,
         'createdAt': FieldValue.serverTimestamp(),
         'imageUrl': imageUrl,
       });
 
-      // Handle successful save
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Resep berhasil disimpan sebagai $status')),
       );
 
       Navigator.pop(context);
     } catch (e) {
-      // Handle errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal menyimpan resep: $e')),
       );

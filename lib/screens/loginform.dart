@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nusantara_food/screens/reset_password.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
@@ -29,7 +30,7 @@ class _LoginformState extends State<Loginform> {
     _passwordController.text = widget.password ?? '';
   }
 
-  void _showDialog(String title, String content) {
+  void _showDialog(String title, String content, {String? userName}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -43,7 +44,9 @@ class _LoginformState extends State<Loginform> {
                 if (title == 'Berhasil') {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const BottomNav(initialIndex: 0)),
+                    MaterialPageRoute(
+                      builder: (context) => BottomNav(initialIndex: 0, userName: userName ?? ''),
+                    ),
                   );
                 }
               },
@@ -53,6 +56,11 @@ class _LoginformState extends State<Loginform> {
         );
       },
     );
+  }
+
+  Future<String?> fetchUserName(String uid) async {
+    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    return doc.data()?['nama'];
   }
 
   void _login() async {
@@ -85,7 +93,8 @@ class _LoginformState extends State<Loginform> {
         password: _passwordController.text,
       );
       if (credential.user != null) {
-        _showDialog('Berhasil', 'Login berhasil!');
+        String? userName = await fetchUserName(credential.user!.uid);
+        _showDialog('Berhasil', 'Login berhasil!', userName: userName);
       }
     } catch (e) {
       String errorMessage = 'Login gagal: ';
@@ -147,7 +156,7 @@ class _LoginformState extends State<Loginform> {
                             margin: EdgeInsets.fromLTRB(0, 0, 35.6, 115),
                             child: Text(
                               'Kembali',
-                              style: textStyle(16, Color(0xFF035444), FontWeight.w800)
+                              style: textStyle(16, Color(0xFF035444), FontWeight.w800),
                             ),
                           ),
                         ),

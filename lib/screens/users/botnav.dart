@@ -8,8 +8,9 @@ import 'package:nusantara_food/screens/users/profile.dart';
 
 class BottomNav extends StatefulWidget {
   final int initialIndex;
+  final String userName;
 
-  const BottomNav({super.key, required this.initialIndex});
+  const BottomNav({super.key, required this.initialIndex, required this.userName});
 
   @override
   _BottomNavState createState() => _BottomNavState();
@@ -17,13 +18,6 @@ class BottomNav extends StatefulWidget {
 
 class _BottomNavState extends State<BottomNav> {
   late int _currentIndex;
-
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const KreasikuScreen(),
-    const ResepScreen(),
-    const ProfileScreen(),
-  ];
 
   @override
   void initState() {
@@ -33,6 +27,13 @@ class _BottomNavState extends State<BottomNav> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screens = [
+      HomeScreen(userName: widget.userName),
+      const KreasikuScreen(),
+      const ResepScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
       body: _screens[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
