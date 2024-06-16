@@ -291,7 +291,7 @@ class _TambahResepState extends State<TambahResep> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildSaveButton('Simpan Draft', () => _saveResep('draft')),
-                  _buildUploadButton('Unggah', () => _saveResep('uploaded')),
+                  _buildUploadButton('Unggah', () => _saveResep('ditinjau')),
                 ],
               ),
             ],

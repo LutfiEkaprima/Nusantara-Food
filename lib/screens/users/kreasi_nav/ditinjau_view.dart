@@ -50,6 +50,40 @@ class _DitinjauViewState extends State<DitinjauView> {
     });
   }
 
+  Future<void> _cancelSubmission(String docId) async {
+    try {
+      await _firestore.collection('resep').doc(docId).update({'status': 'batal'});
+    } catch (error) {
+      print('Error cancelling submission: $error');
+    }
+  }
+
+  void _showCancelDialog(String docId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Batalkan Pengajuan'),
+          content: Text('Apakah Anda yakin ingin membatalkan pengajuan ini?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Tidak'),
+            ),
+            TextButton(
+              onPressed: () {
+                _cancelSubmission(docId);
+                Navigator.of(context).pop();
+                _fetchData();
+              },
+              child: Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +93,7 @@ class _DitinjauViewState extends State<DitinjauView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return LoadingState(
               isLoading: true,
-              child: Container(), // Empty container to show loading animation
+              child: Container(),
             );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -77,9 +111,28 @@ class _DitinjauViewState extends State<DitinjauView> {
                 return ListTile(
                   title: Text(data['title']),
                   subtitle: Text(data['time']),
-                  onTap: () {
-                    // Navigate to detail page if needed
-                  },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, color: Colors.yellow, size: 12),
+                      PopupMenuButton<String>(
+                        onSelected: (value) {
+                          if (value == 'Batalkan Pengajuan') {
+                            _showCancelDialog(documents[index].id);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return {'Batalkan Pengajuan'}
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ],
+                  ),
                 );
               },
             ),

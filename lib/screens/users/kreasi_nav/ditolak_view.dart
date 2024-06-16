@@ -77,6 +77,7 @@ class _DitolakViewState extends State<DitolakView> {
                 return ListTile(
                   title: Text(data['title']),
                   subtitle: Text(data['time']),
+                  trailing: Icon(Icons.circle, color: Colors.red, size: 12),
                   onTap: () {
                     // Navigate to detail page if needed
                   },

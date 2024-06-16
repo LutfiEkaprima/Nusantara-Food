@@ -21,7 +21,7 @@ class _DiterimaViewState extends State<DiterimaView> {
       return await _firestore
           .collection('resep')
           .where('userId', isEqualTo: user.uid)
-          .where('status', isEqualTo: 'diterima')
+          .where('status', isEqualTo: 'disetujui')
           .get();
     } else {
       return Future.error('User not logged in');
@@ -42,12 +42,46 @@ class _DiterimaViewState extends State<DiterimaView> {
     try {
       await _fetchDiterima();
     } catch (error) {
-      print('Error fetching ditinjau recipes: $error');
+      print('Error fetching diterima recipes: $error');
     }
 
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _deleteRecipe(String docId) async {
+    try {
+      await _firestore.collection('resep').doc(docId).delete();
+    } catch (error) {
+      print('Error deleting recipe: $error');
+    }
+  }
+
+  void _showDeleteDialog(String docId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Hapus Resep'),
+          content: Text('Apakah Anda yakin ingin menghapus resep ini?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Tidak'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteRecipe(docId);
+                Navigator.of(context).pop();
+                _fetchData();
+              },
+              child: Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -64,7 +98,7 @@ class _DiterimaViewState extends State<DiterimaView> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Tidak ada resep yang ditinjau'));
+            return const Center(child: Text('Tidak ada resep yang diterima'));
           }
 
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
@@ -77,6 +111,28 @@ class _DiterimaViewState extends State<DiterimaView> {
                 return ListTile(
                   title: Text(data['title']),
                   subtitle: Text(data['time']),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, color: Colors.green, size: 12),
+                      PopupMenuButton<String>(
+                        onSelected: (value) {
+                          if (value == 'Hapus Resep') {
+                            _showDeleteDialog(documents[index].id);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return {'Hapus Resep'}
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ],
+                  ),
                   onTap: () {
                     // Navigate to detail page if needed
                   },
