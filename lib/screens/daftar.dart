@@ -154,6 +154,9 @@ class _DaftarFormState extends State<DaftarForm> {
                     await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
                       'nama': _namaController.text,
                       'email': _emailController.text,
+                      'deskripsi': '',
+                      'fotoProfil': '',
+                      'favoriteFood': [],
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(

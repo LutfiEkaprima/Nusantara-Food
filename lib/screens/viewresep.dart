@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ViewResep extends StatefulWidget {
+  final String docId;
+
+  const ViewResep({super.key, required this.docId});
+
   @override
   _ViewResepState createState() => _ViewResepState();
 }
@@ -9,15 +14,43 @@ class _ViewResepState extends State<ViewResep> {
   final List<String> comments = [];
   final TextEditingController commentController = TextEditingController();
   double userRating = 0.0;
-  final List<String> categories = ['Makanan Penutup', 'Cemilan Manis', 'Pudding', 'Dessert', 'Snack', 'Sweet Treats'];
+
+  DocumentSnapshot? resepData;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('resep').doc(widget.docId).get();
+      setState(() {
+        resepData = doc;
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (resepData == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    Map<String, dynamic> data = resepData!.data() as Map<String, dynamic>;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFED),
-        title: const Text('Caramel Pudding'),
+        title: Text(data['title']),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -29,23 +62,24 @@ class _ViewResepState extends State<ViewResep> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
+              Center( 
                 child: Image.network(
-                  'https://via.placeholder.com/300', // Replace with your image URL
-                  height: 200,
-                  width: 200,
+                  data['imageUrl'] ?? 'https://via.placeholder.com/150',
+                  height: 500,
+                  width: 500,
+                  fit:  BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 16.0),
-              const Text(
-                'Caramel Pudding',
+              Text(
+                data['title'],
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8.0),
-              const SingleChildScrollView(
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
@@ -53,7 +87,7 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Icon(Icons.access_time),
                         SizedBox(width: 4.0),
-                        Text('40 Menit'),
+                        Text('${data['time']} Menit'),
                       ],
                     ),
                     SizedBox(width: 16.0),
@@ -61,7 +95,7 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Icon(Icons.people),
                         SizedBox(width: 4.0),
-                        Text('Porsi untuk 2 orang'),
+                        Text('Porsi untuk ${data['portion']} orang'),
                       ],
                     ),
                     SizedBox(width: 16.0),
@@ -69,7 +103,7 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Icon(Icons.attach_money),
                         SizedBox(width: 4.0),
-                        Text('Rp. 50.000'),
+                        Text('Rp. ${data['cost']}'),
                       ],
                     ),
                     SizedBox(width: 16.0),
@@ -77,7 +111,7 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Icon(Icons.verified),
                         SizedBox(width: 4.0),
-                        Text('Halal'),
+                        Text(data['isFood'] ? 'Makanan' : 'Minuman'),
                       ],
                     ),
                   ],
@@ -90,7 +124,7 @@ class _ViewResepState extends State<ViewResep> {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     CircleAvatar(
                       backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Replace with actual avatar URL
@@ -100,11 +134,11 @@ class _ViewResepState extends State<ViewResep> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Daffa Dandana',
+                          data['publisherName'] ?? 'Anonymous',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4.0),
-                        Text('Tanggal Upload: 01/01/2024'),
+                        Text('Tanggal Upload: ${data['createdAt'].toDate()}'),
                         SizedBox(height: 4.0),
                         Row(
                           children: [
@@ -139,7 +173,7 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 4.0),
-              const Text('- 1 bungkus tepung custard instant\n- 1 liter susu full cream cair\n- 200gr gula pasir\n- 1 sdm air jeruk nipis'),
+              Text(data['ingredients'].join('\n')),
               const SizedBox(height: 16.0),
               const Text(
                 'Peralatan Memasak',
@@ -149,7 +183,7 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 4.0),
-              const Text('- Sendok Sayur\n- Cetakan Puding\n- Sendok\n- Panci\n- Panci Besar\n- Panci Kecil'),
+              Text(data['tools'].join('\n')),
               const SizedBox(height: 16.0),
               const Text(
                 'Cara Memasak Resep',
@@ -162,7 +196,7 @@ class _ViewResepState extends State<ViewResep> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: List.generate(5, (index) {
+                  children: List.generate(data['steps'].length, (index) {
                     return Container(
                       width: 300,
                       margin: const EdgeInsets.only(right: 20.0),
@@ -177,6 +211,9 @@ class _ViewResepState extends State<ViewResep> {
                           Container(
                             height: 200,
                             color: Colors.grey[300],
+                            child: data['stepImages'] != null && data['stepImages'].length > index
+                                ? Image.network(data['stepImages'][index])
+                                : null,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
@@ -187,7 +224,7 @@ class _ViewResepState extends State<ViewResep> {
                             ),
                           ),
                           const SizedBox(height: 4.0),
-                          const Text('Panaskan gula dalam panci dengan 1 sdm jeruk nipis dan air. Jangan diaduk, biarkan hingga terkaramelisasi. Beri sedikit air di bagian pinggir panci agar tidak gosong. Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.Beri sedikit air di bagian pinggir panci agar tidak gosong.'),
+                          Text(data['steps'][index]),
                         ],
                       ),
                     );
@@ -206,11 +243,11 @@ class _ViewResepState extends State<ViewResep> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: List.generate(categories.length, (index) {
+                  children: List.generate(data['categories'].length, (index) {
                     return Container(
                       margin: const EdgeInsets.only(right: 8.0),
                       child: Chip(
-                        label: Text(categories[index]),
+                        label: Text(data['categories'][index]),
                       ),
                     );
                   }),

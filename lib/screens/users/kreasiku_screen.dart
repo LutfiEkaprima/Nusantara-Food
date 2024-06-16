@@ -3,7 +3,6 @@ import 'package:nusantara_food/screens/users/kreasi_nav/diterima_view.dart';
 import 'package:nusantara_food/screens/users/kreasi_nav/ditinjau_view.dart';
 import 'package:nusantara_food/screens/users/kreasi_nav/ditolak_view.dart';
 import 'package:nusantara_food/screens/users/kreasi_nav/draft_view.dart';
-import 'package:nusantara_food/screens/users/kreasi_nav/revisi_view.dart';
 import 'package:nusantara_food/screens/users/tambahresep.dart';
 
 class KreasikuScreen extends StatelessWidget {
@@ -12,7 +11,7 @@ class KreasikuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 4,
       child: Scaffold(
         backgroundColor: const Color(0xFFFFFFED),
         appBar: AppBar(
@@ -24,7 +23,6 @@ class KreasikuScreen extends StatelessWidget {
             tabs: [
               Tab(text: 'DRAFT'),
               Tab(text: 'DITINJAU'),
-              Tab(text: 'REVISI'),
               Tab(text: 'DITERIMA'),
               Tab(text: 'DITOLAK'),
             ],
@@ -36,7 +34,6 @@ class KreasikuScreen extends StatelessWidget {
           children: [
             DraftView(),
             DitinjauView(),
-            RevisiView(),
             DiterimaView(),
             DitolakView(),
           ],

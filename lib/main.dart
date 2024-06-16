@@ -1,5 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:nusantara_food/providers/save_resep_provider.dart';
+import 'package:nusantara_food/screens/users/home_screen.dart';
+import 'package:nusantara_food/screens/users/resep.dart';
+import 'package:provider/provider.dart';
 import 'package:nusantara_food/firebase_options.dart';
 import 'package:nusantara_food/screens/loginmenu.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
@@ -19,13 +23,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const LoginPage(),
-      routes: {
-        '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),
-        '/reset_password': (context) => const ResetPasswordPage(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SavedRecipesProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const LoginPage(),
+        routes: {
+          '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),
+          '/reset_password': (context) => const ResetPasswordPage(),
+          '/home': (context) => HomeScreen(userName: ModalRoute.of(context)!.settings.arguments as String),
+          '/resep': (context) => const ResepScreen(),
+        },
+      ),
     );
   }
+}
+
+class ResepPage {
 }

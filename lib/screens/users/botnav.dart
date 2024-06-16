@@ -37,9 +37,9 @@ class _BottomNavState extends State<BottomNav> {
     return Scaffold(
       body: screens[_currentIndex],
       bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color.fromARGB(0, 255, 255, 255),
         color: Colors.white,
-        buttonBackgroundColor: Colors.red,
+        buttonBackgroundColor: Color.fromARGB(255, 0, 195, 255),
         height: 60,
         index: _currentIndex,
         items: const <CurvedNavigationBarItem>[
