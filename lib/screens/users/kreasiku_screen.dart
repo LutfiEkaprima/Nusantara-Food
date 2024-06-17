@@ -16,10 +16,11 @@ class KreasikuScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFFFFFED),
         appBar: AppBar(
           centerTitle: true,
-          title: const Text('Resep Masakanku'),
+          title: const Text('Resep Masakanku', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
           backgroundColor: const Color(0xFFFFFFED),
           automaticallyImplyLeading: false,
           bottom: const TabBar(
+            labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             tabs: [
               Tab(text: 'DRAFT'),
               Tab(text: 'DITINJAU'),

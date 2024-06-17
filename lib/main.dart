@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nusantara_food/providers/save_resep_provider.dart';
 import 'package:nusantara_food/screens/users/home_screen.dart';
 import 'package:nusantara_food/screens/users/resep.dart';
@@ -29,6 +30,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'Montserrat',
+          textTheme: GoogleFonts.montserratTextTheme()
+        ),
         home: const LoginPage(),
         routes: {
           '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:nusantara_food/providers/save_resep_provider.dart';
 import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:provider/provider.dart';
+import 'package:nusantara_food/utils.dart';
 
 class ResepScreen extends StatelessWidget {
-  
   const ResepScreen({super.key});
 
   @override
@@ -15,12 +15,12 @@ class ResepScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFFFFFED),
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text('Resep Yang Disimpan'),
+        title: Text('Resep Yang Disimpan', style: textStyle( 20 ,Colors.black, FontWeight.bold),),
       ),
       body: Consumer<SavedRecipesProvider>(
         builder: (context, savedRecipesProvider, child) {
           if (savedRecipesProvider.savedRecipes.isEmpty) {
-            return Center(
+            return const Center(
               child: Text(
                 'Belum ada resep yang disimpan',
                 style: TextStyle(fontSize: 18.0),
@@ -31,11 +31,11 @@ class ResepScreen extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of boxes in a row
-                crossAxisSpacing: 10.0, // Space between the boxes horizontally
-                mainAxisSpacing: 10.0, // Space between the boxes vertically
-                childAspectRatio: 0.8, // Aspect ratio of each box
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10.0,
+                mainAxisSpacing: 10.0,
+                childAspectRatio: 0.8,
               ),
               itemBuilder: (context, index) {
                 final recipe = savedRecipesProvider.savedRecipes[index];
@@ -73,6 +73,10 @@ class RecipeCard extends StatelessWidget {
     final rating = recipe['rating']?.toString() ?? 'N/A';
     final docId = recipe['docId'];
 
+    final truncatedPublisherName = publisherName.length > 10
+        ? publisherName.substring(0, 15) + '...'
+        : publisherName;
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -82,7 +86,8 @@ class RecipeCard extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(10.0)),
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
@@ -99,8 +104,8 @@ class RecipeCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      publisherName,
-                      style: TextStyle(
+                      truncatedPublisherName,
+                      style: const TextStyle(
                         fontSize: 12.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -121,26 +126,26 @@ class RecipeCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 4.0),
+                const SizedBox(height: 4.0),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4.0),
+                const SizedBox(height: 4.0),
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.star,
                       size: 16.0,
                       color: Colors.amber,
                     ),
-                    SizedBox(width: 4.0),
+                    const SizedBox(width: 4.0),
                     Text(
                       rating,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w500,
                       ),

@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:nusantara_food/utils.dart';
 
 class ViewResep extends StatefulWidget {
   final String docId;
@@ -14,6 +17,7 @@ class _ViewResepState extends State<ViewResep> {
   final List<String> comments = [];
   final TextEditingController commentController = TextEditingController();
   double userRating = 0.0;
+  Map<String, dynamic>? _userData;
 
   DocumentSnapshot? resepData;
 
@@ -21,7 +25,28 @@ class _ViewResepState extends State<ViewResep> {
   void initState() {
     super.initState();
     fetchData();
+    _fetchUserData();
   }
+
+  Future<void> _fetchUserData() async {
+    final data = await fetchUserData();
+    setState(() {
+      _userData = data;
+    });
+  }
+
+  Future<Map<String, dynamic>?> fetchUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      return doc.data();
+    }
+    return null;
+  }
+
 
   Future<void> fetchData() async {
     try {
@@ -45,12 +70,14 @@ class _ViewResepState extends State<ViewResep> {
     }
 
     Map<String, dynamic> data = resepData!.data() as Map<String, dynamic>;
+    DateTime createdAt = (data['createdAt'] as Timestamp).toDate();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(createdAt);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFED),
-        title: Text(data['title']),
+        title: Text(data['title'], style: textStyle(20, Colors.black, FontWeight.bold),),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -62,21 +89,18 @@ class _ViewResepState extends State<ViewResep> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center( 
+              Center(
                 child: Image.network(
-                  data['imageUrl'] ?? 'https://via.placeholder.com/150',
+                  data['imageUrl'] ?? 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
                   height: 500,
                   width: 500,
-                  fit:  BoxFit.cover,
+                  fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 16.0),
               Text(
                 data['title'],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(20, Colors.black, FontWeight.bold)
               ),
               const SizedBox(height: 8.0),
               SingleChildScrollView(
@@ -111,7 +135,7 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Icon(Icons.verified),
                         SizedBox(width: 4.0),
-                        Text(data['isFood'] ? 'Makanan' : 'Minuman'),
+                        Text(data['recipeType'] ?? 'null'),
                       ],
                     ),
                   ],
@@ -127,7 +151,10 @@ class _ViewResepState extends State<ViewResep> {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Replace with actual avatar URL
+                      radius: 30,
+                      backgroundImage: _userData?['fotoProfil'] != null
+                    ? NetworkImage(_userData!['fotoProfil']) 
+                    : null,
                     ),
                     SizedBox(width: 8.0),
                     Column(
@@ -135,10 +162,10 @@ class _ViewResepState extends State<ViewResep> {
                       children: [
                         Text(
                           data['publisherName'] ?? 'Anonymous',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: textStyle(16, Colors.black, FontWeight.w600),
                         ),
                         SizedBox(height: 4.0),
-                        Text('Tanggal Upload: ${data['createdAt'].toDate()}'),
+                        Text('Tanggal Upload: $formattedDate'),
                         SizedBox(height: 4.0),
                         Row(
                           children: [
@@ -157,40 +184,28 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Informasi Resep',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(20, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
-              const Text(
+              Text(
                 'Bahan Memasak',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 4.0),
               Text(data['ingredients'].join('\n')),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Peralatan Memasak',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 4.0),
               Text(data['tools'].join('\n')),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Cara Memasak Resep',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
               SingleChildScrollView(
@@ -211,17 +226,14 @@ class _ViewResepState extends State<ViewResep> {
                           Container(
                             height: 200,
                             color: Colors.grey[300],
-                            child: data['stepImages'] != null && data['stepImages'].length > index
+                            child: (data['stepImages'] != null && data['stepImages'].length > index && data['stepImages'][index] != null)
                                 ? Image.network(data['stepImages'][index])
                                 : null,
                           ),
                           const SizedBox(height: 8.0),
                           Text(
                             'Step ${index + 1}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: textStyle(16, Colors.black, FontWeight.bold),
                           ),
                           const SizedBox(height: 4.0),
                           Text(data['steps'][index]),
@@ -232,12 +244,9 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Kategori Resep',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
               SingleChildScrollView(
@@ -254,12 +263,9 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Komentar',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
               Column(
@@ -321,12 +327,9 @@ class _ViewResepState extends State<ViewResep> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              const Text(
+              Text(
                 'Beri Rating',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
               Row(

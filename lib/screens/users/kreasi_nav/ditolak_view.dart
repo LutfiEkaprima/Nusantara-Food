@@ -60,12 +60,12 @@ class _DitolakViewState extends State<DitolakView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return LoadingState(
               isLoading: true,
-              child: Container(), // Empty container to show loading animation
+              child: Container(),
             );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Tidak ada resep yang ditolak'));
+            return const Center(child: Text('Tidak ada resep yang ditolak', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200)));
           }
 
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
@@ -76,8 +76,8 @@ class _DitolakViewState extends State<DitolakView> {
               itemBuilder: (context, index) {
                 final data = documents[index].data() as Map<String, dynamic>;
                 return ListTile(
-                  title: Text(data['title']),
-                  subtitle: Text(data['time']),
+                  title: Text(data['title'], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  subtitle: Text(data['time' ]+ ' Menit', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200)),
                   trailing: Icon(Icons.circle, color: Colors.red, size: 12),
                   onTap: () {
                     // Navigate to detail page if needed

@@ -46,7 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
         dinnerRecipes.clear();
 
         for (var recipe in allRecipes) {
-          List<String> categories = List<String>.from(recipe['categories'] ?? []);
+          List<String> categories =
+              List<String>.from(recipe['categories'] ?? []);
           if (categories.contains('sarapan')) {
             breakfastRecipes.add(recipe);
           }
@@ -182,16 +183,23 @@ class Section extends StatelessWidget {
               itemBuilder: (context, index) {
                 final recipe = recipes[index];
 
-                final imageUrl = recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
+                final imageUrl =
+                    recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
                 final title = recipe['title'] ?? 'No title';
                 final publisherName = recipe['publisherName'] ?? 'Unknown';
                 final rating = recipe['rating']?.toString() ?? 'N/A';
+
+                final truncatedPublisherName = publisherName.length > 10
+                    ? publisherName.substring(0, 15) + '...'
+                    : publisherName;
 
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ViewResep(docId: recipe['docId'])),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ViewResep(docId: recipe['docId'])),
                     );
                   },
                   child: Container(
@@ -212,7 +220,8 @@ class Section extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(8.0)),
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(8.0)),
                           child: Image.network(
                             imageUrl,
                             height: 200,
@@ -227,35 +236,47 @@ class Section extends StatelessWidget {
                             children: [
                               Text(
                                 title,
-                                style: textStyle(14, Colors.black, FontWeight.bold),
+                                style: textStyle(
+                                    14, Colors.black, FontWeight.bold),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                publisherName,
-                                style: textStyle(12, Colors.black54, FontWeight.normal),
+                                truncatedPublisherName,
+                                style: textStyle(
+                                    12, Colors.black54, FontWeight.normal),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10.0),
+                                padding:
+                                    const EdgeInsets.fromLTRB(0, 0, 0, 10.0),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.star, color: Colors.yellow, size: 16),
+                                    const Icon(Icons.star,
+                                        color: Colors.yellow, size: 16),
                                     const SizedBox(width: 4.0),
                                     Text(
                                       rating,
-                                      style: textStyle(12, Colors.black54, FontWeight.normal),
+                                      style: textStyle(12, Colors.black54,
+                                          FontWeight.normal),
                                     ),
                                     const Spacer(),
                                     Consumer<SavedRecipesProvider>(
-                                      builder: (context, savedRecipesProvider, child) {
-                                        bool isSaved = savedRecipesProvider.isSaved(recipe['docId']);
+                                      builder: (context, savedRecipesProvider,
+                                          child) {
+                                        bool isSaved = savedRecipesProvider
+                                            .isSaved(recipe['docId']);
                                         return IconButton(
                                           icon: Icon(
-                                            isSaved ? Icons.bookmark : Icons.bookmark_border,
-                                            color: isSaved ? Colors.yellow : Colors.black54,
+                                            isSaved
+                                                ? Icons.bookmark
+                                                : Icons.bookmark_border,
+                                            color: isSaved
+                                                ? Colors.yellow
+                                                : Colors.black54,
                                           ),
                                           onPressed: () {
-                                            savedRecipesProvider.toggleRecipe(recipe);
+                                            savedRecipesProvider
+                                                .toggleRecipe(recipe);
                                           },
                                         );
                                       },

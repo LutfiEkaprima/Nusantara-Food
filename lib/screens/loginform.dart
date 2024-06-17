@@ -139,126 +139,109 @@ class _LoginformState extends State<Loginform> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       body: LoadingState(
         isLoading: _isLoading,
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFFFFFFED),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(22.6, 22, 22.6, 111),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 35.6, 115),
-                            child: Text(
-                              'Kembali',
-                              style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(45, 50, 0, 0),
-                          child: Image.asset(
-                            'assets/icons/Icon.png',
-                            width: 116,
-                            height: 116,
-                          ),
-                        ),
-                      ],
-                    ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(22.6, 22, 22.6, 111),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    'Kembali',
+                    style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
                   ),
                 ),
-                Text(
-                  'Selamat Datang',
-                  style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
+              ),
+              const SizedBox(height: 50),
+              Center(
+                child: Image.asset(
+                  'assets/icons/Icon.png',
+                  width: 116,
+                  height: 116,
                 ),
-                const SizedBox(height: 43),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Email',
-                      style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        errorText: _emailError.isNotEmpty ? _emailError : null,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Selamat Datang',
+                style: textStyle(16, const Color(0xFF035444), FontWeight.w800),
+              ),
+              const SizedBox(height: 43),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Email',
+                    style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
                       ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      errorText: _emailError.isNotEmpty ? _emailError : null,
                     ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'Password',
-                      style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        errorText: _passwordError.isNotEmpty ? _passwordError : null,
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Password',
+                    style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
                       ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      errorText: _passwordError.isNotEmpty ? _passwordError : null,
                     ),
-                    const SizedBox(height: 42),
-                    ElevatedButton(
-                      onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF035444),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  const SizedBox(height: 42),
+                  ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF035444),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Center(
-                        child: Text(
-                          'Masuk',
-                          style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
-                        ),
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    const SizedBox(height: 20),
-                    TextButton(
-                      onPressed: _navigateToResetPassword,
+                    child: Center(
                       child: Text(
-                        'Lupa Password?',
-                        style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
+                        'Masuk',
+                        style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: _navigateToResetPassword,
+                    child: Text(
+                      'Lupa Password?',
+                      style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

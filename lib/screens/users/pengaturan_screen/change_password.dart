@@ -74,7 +74,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Ganti Password')),
+      backgroundColor: const Color(0xFFFFFFED),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFFFFED),
+        title: Text('Ganti Password')
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

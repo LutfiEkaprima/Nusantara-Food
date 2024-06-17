@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
 
 class TambahResep extends StatefulWidget {
   final DocumentSnapshot? draft;
@@ -74,7 +75,7 @@ class _TambahResepState extends State<TambahResep> {
       _portionController.text = draft['portion'];
       _costController.text = draft['cost'];
       _timeController.text = draft['time'];
-      _recipeType = draft['recipeType']; // Changed to recipeType
+      _recipeType = draft['recipeType'];
       _ingredientControllers = (draft['ingredients'] as List<dynamic>)
           .map((e) => TextEditingController(text: e as String))
           .toList();
@@ -91,7 +92,23 @@ class _TambahResepState extends State<TambahResep> {
       if (draft['imageUrl'] != null) {
         _imageUrl = draft['imageUrl'];
       }
+
+      if (draft['createdAt'] != null) {
+        Timestamp timestamp = draft['createdAt'] as Timestamp;
+        DateTime createdAt = timestamp.toDate();
+        String formattedDate = DateFormat('yyyy-MM-dd').format(createdAt);
+        print("Draft created at: $formattedDate");
+      }
     });
+  }
+
+  Future<String?> getUserName(String uid) async {
+    DocumentSnapshot userDoc =
+        await _firestore.collection('users').doc(uid).get();
+    if (userDoc.exists && userDoc['nama'] != null) {
+      return userDoc['nama'];
+    }
+    return null;
   }
 
   Future<void> _saveResep(String status) async {
@@ -105,14 +122,24 @@ class _TambahResepState extends State<TambahResep> {
         return;
       }
 
+      String? publisherName = await getUserName(user.uid);
+      if (publisherName == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Nama pengguna tidak ditemukan.')),
+        );
+        return;
+      }
+
+
       String? imageUrl = _imageUrl;
       if (_image != null) {
         imageUrl = await _uploadImageToStorage(_image!);
-        _imageUrl = null; // Clear the old URL if a new image is uploaded
+        _imageUrl = null;
       }
 
       final docData = {
         'userId': user.uid,
+        'publisherName': publisherName,
         'title': _titleController.text,
         'portion': _portionController.text,
         'cost': _costController.text,
@@ -124,7 +151,8 @@ class _TambahResepState extends State<TambahResep> {
         'categories': _categoryControllers.map((e) => e.text).toList(),
         'stepImages': _stepImages,
         'status': status,
-        'createdAt': FieldValue.serverTimestamp(),
+        'createdAt': FieldValue
+            .serverTimestamp(),
         'imageUrl': imageUrl,
       };
 
@@ -329,7 +357,7 @@ class _TambahResepState extends State<TambahResep> {
     return Text(
       title,
       style: const TextStyle(
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: FontWeight.bold,
         color: Colors.black,
       ),
@@ -343,6 +371,7 @@ class _TambahResepState extends State<TambahResep> {
     String? Function(String?)? validator,
   }) {
     return TextFormField(
+      style: const TextStyle(fontSize: 13),
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
@@ -407,13 +436,14 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildDynamicStepField() {
     return ReorderableListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if (newIndex > oldIndex) {
             newIndex -= 1;
           }
-          final TextEditingController step = _stepControllers.removeAt(oldIndex);
+          final TextEditingController step =
+              _stepControllers.removeAt(oldIndex);
           final String? image = _stepImages.removeAt(oldIndex);
           _stepControllers.insert(newIndex, step);
           _stepImages.insert(newIndex, image);
@@ -456,7 +486,8 @@ class _TambahResepState extends State<TambahResep> {
         Expanded(
           child: _stepImages[index] != null
               ? Image.network(_stepImages[index]!, height: 150)
-              : const Text('Belum ada gambar untuk langkah ini.'),
+              : const Text('Belum ada gambar untuk langkah ini.',
+                  style: TextStyle(fontSize: 12)),
         ),
         IconButton(
           icon: const Icon(Icons.camera_alt, color: Colors.blue),
@@ -485,13 +516,23 @@ class _TambahResepState extends State<TambahResep> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
           onPressed: () => _saveResep('ditinjau'),
-          child: const Text('Upload Resep'),
+          child: const Text(
+            'Upload Resep',
+            style: TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white),
+          ),
         ),
         const SizedBox(width: 16),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
           onPressed: () => _saveResep('draft'),
-          child: const Text('Simpan Resep'),
+          child: const Text(
+            'Simpan Resep',
+            style: TextStyle(
+                fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white),
+          ),
         ),
       ],
     );
@@ -507,7 +548,10 @@ class _TambahResepState extends State<TambahResep> {
                 : const Text('Belum ada gambar yang dipilih.'),
         TextButton(
           onPressed: _pickImage,
-          child: const Text('Pilih Gambar'),
+          child: const Text(
+            'Pilih Gambar',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

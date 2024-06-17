@@ -46,18 +46,22 @@ class _BottomNavState extends State<BottomNav> {
           CurvedNavigationBarItem(
             child: Icon(Icons.home, size: 30),
             label: 'HOME',
+            labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           ),
           CurvedNavigationBarItem(
             child: Icon(Icons.create, size: 30),
             label: 'KREASIKU',
+            labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           ),
           CurvedNavigationBarItem(
             child: Icon(Icons.book, size: 30),
             label: 'RESEP',
+            labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           ),
           CurvedNavigationBarItem(
             child: Icon(Icons.person, size: 30),
             label: 'PROFILE',
+            labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
           ),
         ],
         onTap: (index) {
