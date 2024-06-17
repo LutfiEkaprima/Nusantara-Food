@@ -87,6 +87,7 @@ class _DitinjauViewState extends State<DitinjauView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       body: FutureBuilder<QuerySnapshot>(
         future: _fetchDitinjau(),
         builder: (context, snapshot) {

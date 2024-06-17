@@ -109,6 +109,75 @@ class _DaftarFormState extends State<DaftarForm> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _konfirmasiPasswordController = TextEditingController();
 
+  Future<void> _sendEmailVerification(User user) async {
+    try {
+      await user.sendEmailVerification();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email verifikasi telah dikirim. Periksa email Anda.'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal mengirim email verifikasi: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _register() async {
+    if (_formKey.currentState!.validate()) {
+      if (_passwordController.text != _konfirmasiPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Password tidak cocok'),
+          ),
+        );
+        return;
+      }
+
+      widget.setLoading(true);
+
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
+          'nama': _namaController.text,
+          'email': _emailController.text,
+          'deskripsi': '',
+          'fotoProfil': 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
+          'favoriteFood': [],
+        });
+
+        await _sendEmailVerification(userCredential.user!);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pendaftaran berhasil. Periksa email Anda untuk verifikasi.'),
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Loginform()),
+        );
+
+      } on FirebaseAuthException catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pendaftaran gagal: ${e.message}'),
+          ),
+        );
+      } finally {
+        widget.setLoading(false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -132,55 +201,7 @@ class _DaftarFormState extends State<DaftarForm> {
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  if (_passwordController.text != _konfirmasiPasswordController.text) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Password tidak cocok'),
-                      ),
-                    );
-                    return;
-                  }
-
-                  widget.setLoading(true);
-
-                  try {
-                    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: _emailController.text,
-                      password: _passwordController.text,
-                    );
-
-                    await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set({
-                      'nama': _namaController.text,
-                      'email': _emailController.text,
-                      'deskripsi': '',
-                      'fotoProfil': '',
-                      'favoriteFood': [],
-                    });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Pendaftaran berhasil'),
-                      ),
-                    );
-
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Loginform()),
-                    );
-
-                  } on FirebaseAuthException catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Pendaftaran gagal: ${e.message}'),
-                      ),
-                    );
-                  } finally {
-                    widget.setLoading(false);
-                  }
-                }
-              },
+              onPressed: _register,
               child: Text(
                 'DAFTAR',
                 style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),

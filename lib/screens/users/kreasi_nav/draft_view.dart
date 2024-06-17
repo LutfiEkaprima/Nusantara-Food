@@ -63,6 +63,7 @@ class _DraftViewState extends State<DraftView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       body: FutureBuilder<QuerySnapshot>(
         future: _fetchDrafts(),
         builder: (context, snapshot) {

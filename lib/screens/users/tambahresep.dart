@@ -30,8 +30,8 @@ class _TambahResepState extends State<TambahResep> {
   final TextEditingController _timeController = TextEditingController();
   List<String?> _stepImages = [];
   XFile? _image;
-  bool _isFood = false;
-  bool _isDrink = false;
+  String? _imageUrl;
+  String _recipeType = 'Makanan';
 
   @override
   void initState() {
@@ -39,10 +39,11 @@ class _TambahResepState extends State<TambahResep> {
     if (widget.draft != null) {
       _loadDraftData(widget.draft!);
     } else {
-      _ingredientControllers.add(TextEditingController());
-      _stepControllers.add(TextEditingController());
-      _toolControllers.add(TextEditingController());
-      _categoryControllers.add(TextEditingController());
+      _addNewItem(_ingredientControllers);
+      _addNewItem(_stepControllers);
+      _addNewItem(_toolControllers);
+      _addNewItem(_categoryControllers);
+      _stepImages.add(null);
     }
   }
 
@@ -73,15 +74,22 @@ class _TambahResepState extends State<TambahResep> {
       _portionController.text = draft['portion'];
       _costController.text = draft['cost'];
       _timeController.text = draft['time'];
-      _isFood = draft['isFood'];
-      _isDrink = draft['isDrink'];
-      _ingredientControllers = (draft['ingredients'] as List<dynamic>).map((e) => TextEditingController(text: e as String)).toList();
-      _stepControllers = (draft['steps'] as List<dynamic>).map((e) => TextEditingController(text: e as String)).toList();
-      _toolControllers = (draft['tools'] as List<dynamic>).map((e) => TextEditingController(text: e as String)).toList();
-      _categoryControllers = (draft['categories'] as List<dynamic>).map((e) => TextEditingController(text: e as String)).toList();
+      _recipeType = draft['recipeType']; // Changed to recipeType
+      _ingredientControllers = (draft['ingredients'] as List<dynamic>)
+          .map((e) => TextEditingController(text: e as String))
+          .toList();
+      _stepControllers = (draft['steps'] as List<dynamic>)
+          .map((e) => TextEditingController(text: e as String))
+          .toList();
+      _toolControllers = (draft['tools'] as List<dynamic>)
+          .map((e) => TextEditingController(text: e as String))
+          .toList();
+      _categoryControllers = (draft['categories'] as List<dynamic>)
+          .map((e) => TextEditingController(text: e as String))
+          .toList();
       _stepImages = List<String?>.from(draft['stepImages']);
       if (draft['imageUrl'] != null) {
-        _image = XFile(draft['imageUrl']);
+        _imageUrl = draft['imageUrl'];
       }
     });
   }
@@ -97,9 +105,10 @@ class _TambahResepState extends State<TambahResep> {
         return;
       }
 
-      String? imageUrl;
+      String? imageUrl = _imageUrl;
       if (_image != null) {
         imageUrl = await _uploadImageToStorage(_image!);
+        _imageUrl = null; // Clear the old URL if a new image is uploaded
       }
 
       final docData = {
@@ -108,8 +117,7 @@ class _TambahResepState extends State<TambahResep> {
         'portion': _portionController.text,
         'cost': _costController.text,
         'time': _timeController.text,
-        'isFood': _isFood,
-        'isDrink': _isDrink,
+        'recipeType': _recipeType,
         'ingredients': _ingredientControllers.map((e) => e.text).toList(),
         'steps': _stepControllers.map((e) => e.text).toList(),
         'tools': _toolControllers.map((e) => e.text).toList(),
@@ -181,6 +189,22 @@ class _TambahResepState extends State<TambahResep> {
     }
   }
 
+  void _addNewItem(List<TextEditingController> controllers) {
+    setState(() {
+      controllers.add(TextEditingController());
+    });
+  }
+
+  void _removeItem(List<TextEditingController> controllers, int index) {
+    setState(() {
+      if (controllers.length > 1) {
+        controllers.removeAt(index);
+      } else {
+        controllers[0].clear();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -250,7 +274,7 @@ class _TambahResepState extends State<TambahResep> {
               ),
               const SizedBox(height: 16.0),
               _buildTextField(
-                'Waktu Memasak',
+                'Waktu Memasak (menit)',
                 controller: _timeController,
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -264,36 +288,36 @@ class _TambahResepState extends State<TambahResep> {
                 },
               ),
               const SizedBox(height: 16.0),
-              _buildSectionTitle('Jenis Makanan'),
-              _buildFoodTypeSelection(),
-              const SizedBox(height: 16.0),
-              _buildSectionTitle('Bahan Utama'),
-              _buildReorderableIngredientFields(),
-              const SizedBox(height: 8.0),
-              _buildAddButton('Tambah Bahan', _addIngredientField),
-              const SizedBox(height: 16.0),
-              _buildSectionTitle('Alat & Perlengkapan'),
-              _buildReorderableToolsFields(),
-              const SizedBox(height: 8.0),
-              _buildAddButton('Tambah Alat', _addToolField),
-              const SizedBox(height: 16.0),
-              _buildSectionTitle('Langkah Memasak'),
-              _buildReorderableStepsFields(),
-              const SizedBox(height: 8.0),
-              _buildAddButton('Tambah Langkah', _addStepField),
-              const SizedBox(height: 16.0),
-              _buildSectionTitle('Kategori Resep'),
-              _buildReorderableCategoryFields(),
-              const SizedBox(height: 8.0),
-              _buildAddButton('Tambah Kategori', _addCategoryField),
-              const SizedBox(height: 16.0),
+              _buildSectionTitle('Jenis Resep'),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildSaveButton('Simpan Draft', () => _saveResep('draft')),
-                  _buildUploadButton('Unggah', () => _saveResep('ditinjau')),
+                  _buildRadioButton('Makanan', _recipeType, (value) {
+                    setState(() {
+                      _recipeType = value!;
+                    });
+                  }),
+                  const SizedBox(width: 16.0),
+                  _buildRadioButton('Minuman', _recipeType, (value) {
+                    setState(() {
+                      _recipeType = value!;
+                    });
+                  }),
                 ],
               ),
+              const SizedBox(height: 25.0),
+              _buildSectionTitle('Bahan-bahan'),
+              _buildDynamicTextField(_ingredientControllers, 'Bahan'),
+              const SizedBox(height: 25.0),
+              _buildSectionTitle('Peralatan Masak'),
+              _buildDynamicTextField(_toolControllers, 'Peralatan'),
+              const SizedBox(height: 25.0),
+              _buildSectionTitle('Langkah-langkah'),
+              _buildDynamicStepField(),
+              const SizedBox(height: 25.0),
+              _buildSectionTitle('Kategori Resep'),
+              _buildDynamicTextField(_categoryControllers, 'Kategori'),
+              const SizedBox(height: 30.0),
+              _buildSaveButton(),
             ],
           ),
         ),
@@ -304,298 +328,188 @@ class _TambahResepState extends State<TambahResep> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
     );
   }
 
-  Widget _buildTextField(String hintText, {TextEditingController? controller, TextInputType? keyboardType, FormFieldValidator<String>? validator}) {
+  Widget _buildTextField(
+    String hintText, {
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
-      ),
-      validator: validator,
-    );
-  }
-
-  Widget _buildImagePicker() {
-    return GestureDetector(
-      onTap: _pickImage,
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        color: Colors.grey[300],
-        child: _image == null
-            ? const Icon(Icons.add_a_photo, size: 50)
-            : Image.file(File(_image!.path), fit: BoxFit.cover),
+        border: const OutlineInputBorder(),
       ),
     );
   }
 
-  Widget _buildFoodTypeSelection() {
+  Widget _buildDynamicTextField(
+      List<TextEditingController> controllers, String hintText) {
+    return Column(
+      children: List.generate(controllers.length, (index) {
+        return Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                '$hintText ${index + 1}',
+                controller: controllers[index],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return '$hintText tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            const SizedBox(width: 8),
+            _buildAddRemoveButton(controllers, index),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildAddRemoveButton(
+      List<TextEditingController> controllers, int index) {
+    return IconButton(
+      icon: Icon(
+        index == controllers.length - 1 ? Icons.add : Icons.remove,
+        color: Colors.blue,
+      ),
+      onPressed: () {
+        setState(() {
+          if (index == controllers.length - 1) {
+            controllers.add(TextEditingController());
+            if (controllers == _stepControllers) {
+              _stepImages.add(null);
+            }
+          } else {
+            controllers.removeAt(index);
+            if (controllers == _stepControllers) {
+              _stepImages.removeAt(index);
+            }
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildDynamicStepField() {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if (newIndex > oldIndex) {
+            newIndex -= 1;
+          }
+          final TextEditingController step = _stepControllers.removeAt(oldIndex);
+          final String? image = _stepImages.removeAt(oldIndex);
+          _stepControllers.insert(newIndex, step);
+          _stepImages.insert(newIndex, image);
+        });
+      },
+      children: List.generate(_stepControllers.length, (index) {
+        return Column(
+          key: ValueKey('step_$index'),
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    'Langkah ${index + 1}',
+                    controller: _stepControllers[index],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Langkah tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _buildAddRemoveButton(_stepControllers, index),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _buildStepImagePicker(index),
+            const SizedBox(height: 8),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildStepImagePicker(int index) {
     return Row(
       children: [
         Expanded(
-          child: RadioListTile<bool>(
-            title: const Text('Makanan'),
-            value: true,
-            groupValue: _isFood,
-            onChanged: (newValue) {
-              setState(() {
-                _isFood = newValue ?? false;
-                _isDrink = !newValue!;
-              });
-            },
-          ),
+          child: _stepImages[index] != null
+              ? Image.network(_stepImages[index]!, height: 150)
+              : const Text('Belum ada gambar untuk langkah ini.'),
         ),
-        Expanded(
-          child: RadioListTile<bool>(
-            title: const Text('Minuman'),
-            value: true,
-            groupValue: _isDrink,
-            onChanged: (newValue) {
-              setState(() {
-                _isDrink = newValue ?? false;
-                _isFood = !newValue!;
-              });
-            },
-          ),
+        IconButton(
+          icon: const Icon(Icons.camera_alt, color: Colors.blue),
+          onPressed: () => _pickStepImage(index),
         ),
       ],
     );
   }
 
-  Widget _buildReorderableIngredientFields() {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final controller = _ingredientControllers.removeAt(oldIndex);
-          _ingredientControllers.insert(newIndex, controller);
-        });
-      },
-      children: _ingredientControllers
-          .asMap()
-          .map((i, controller) => MapEntry(
-                i,
-                ListTile(
-                  key: ValueKey(i),
-                  title: Row(
-                    children: [
-                      Expanded(child: _buildTextField('Masukkan Bahan Utama', controller: controller)),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _removeIngredientField(i),
-                      ),
-                    ],
-                  ),
-                ),
-              ))
-          .values
-          .toList(),
+  Widget _buildRadioButton(
+      String title, String groupValue, void Function(String?)? onChanged) {
+    return Row(
+      children: [
+        Radio<String>(
+          value: title,
+          groupValue: groupValue,
+          onChanged: onChanged,
+        ),
+        Text(title),
+      ],
     );
   }
 
-  Widget _buildReorderableToolsFields() {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final controller = _toolControllers.removeAt(oldIndex);
-          _toolControllers.insert(newIndex, controller);
-        });
-      },
-      children: _toolControllers
-          .asMap()
-          .map((i, controller) => MapEntry(
-                i,
-                ListTile(
-                  key: ValueKey(i),
-                  title: Row(
-                    children: [
-                      Expanded(child: _buildTextField('Masukkan Alat & Perlengkapan', controller: controller)),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _removeToolField(i),
-                      ),
-                    ],
-                  ),
-                ),
-              ))
-          .values
-          .toList(),
+  Widget _buildSaveButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: () => _saveResep('ditinjau'),
+          child: const Text('Upload Resep'),
+        ),
+        const SizedBox(width: 16),
+        ElevatedButton(
+          onPressed: () => _saveResep('draft'),
+          child: const Text('Simpan Resep'),
+        ),
+      ],
     );
   }
 
-  Widget _buildReorderableStepsFields() {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final controller = _stepControllers.removeAt(oldIndex);
-          _stepControllers.insert(newIndex, controller);
-          final stepImage = _stepImages.removeAt(oldIndex);
-          _stepImages.insert(newIndex, stepImage);
-        });
-      },
-      children: _stepControllers
-          .asMap()
-          .map((i, controller) => MapEntry(
-                i,
-                ListTile(
-                  key: ValueKey(i),
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(child: _buildTextField('Masukkan Langkah Memasak', controller: controller)),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _removeStepField(i),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8.0),
-                      GestureDetector(
-                        onTap: () => _pickStepImage(i),
-                        child: Container(
-                          height: 150,
-                          width: double.infinity,
-                          color: Colors.grey[300],
-                          child: _stepImages.length > i && _stepImages[i] != null
-                              ? Image.network(_stepImages[i]!, fit: BoxFit.cover)
-                              : const Icon(Icons.add_a_photo, size: 50),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ))
-          .values
-          .toList(),
+  Widget _buildImagePicker() {
+    return Column(
+      children: [
+        _imageUrl != null
+            ? Image.network(_imageUrl!)
+            : _image != null
+                ? Image.file(File(_image!.path))
+                : const Text('Belum ada gambar yang dipilih.'),
+        TextButton(
+          onPressed: _pickImage,
+          child: const Text('Pilih Gambar'),
+        ),
+      ],
     );
-  }
-
-  Widget _buildReorderableCategoryFields() {
-    return ReorderableListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      onReorder: (oldIndex, newIndex) {
-        setState(() {
-          if (newIndex > oldIndex) {
-            newIndex -= 1;
-          }
-          final controller = _categoryControllers.removeAt(oldIndex);
-          _categoryControllers.insert(newIndex, controller);
-        });
-      },
-      children: _categoryControllers
-          .asMap()
-          .map((i, controller) => MapEntry(
-                i,
-                ListTile(
-                  key: ValueKey(i),
-                  title: Row(
-                    children: [
-                      Expanded(child: _buildTextField('Masukkan Kategori Resep', controller: controller)),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _removeCategoryField(i),
-                      ),
-                    ],
-                  ),
-                ),
-              ))
-          .values
-          .toList(),
-    );
-  }
-
-  Widget _buildAddButton(String label, VoidCallback onPressed) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: const Icon(Icons.add),
-      label: Text(label),
-    );
-  }
-
-  Widget _buildSaveButton(String label, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-      onPressed: onPressed,
-      child: Text(label),
-    );
-  }
-
-  Widget _buildUploadButton(String label, VoidCallback onPressed) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-      onPressed: onPressed,
-      child: Text(label),
-    );
-  }
-
-  void _addIngredientField() {
-    setState(() {
-      _ingredientControllers.add(TextEditingController());
-    });
-  }
-
-  void _removeIngredientField(int index) {
-    setState(() {
-      _ingredientControllers.removeAt(index);
-    });
-  }
-
-  void _addStepField() {
-    setState(() {
-      _stepControllers.add(TextEditingController());
-      _stepImages.add(null);
-    });
-  }
-
-  void _removeStepField(int index) {
-    setState(() {
-      _stepControllers.removeAt(index);
-      _stepImages.removeAt(index);
-    });
-  }
-
-  void _addToolField() {
-    setState(() {
-      _toolControllers.add(TextEditingController());
-    });
-  }
-
-  void _removeToolField(int index) {
-    setState(() {
-      _toolControllers.removeAt(index);
-    });
-  }
-
-  void _addCategoryField() {
-    setState(() {
-      _categoryControllers.add(TextEditingController());
-    });
-  }
-
-  void _removeCategoryField(int index) {
-    setState(() {
-      _categoryControllers.removeAt(index);
-    });
   }
 }

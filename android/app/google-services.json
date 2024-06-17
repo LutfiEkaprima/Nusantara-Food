@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "379442482952",
+    "firebase_url": "https://nusatara-food-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "nusatara-food",
     "storage_bucket": "nusatara-food.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.nusantara_food"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "379442482952-n35cqupgo3ssld4q0c6tg86ekj6f922q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nusantara_food",
+            "certificate_hash": "061dea781b09e7424e78d7dcbc9d5b58499d2dfc"
+          }
+        },
+        {
+          "client_id": "379442482952-afdgjeahn7m6rou1b0ui5js2e7jo0g0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDNA14UbrogU_o3dekw1pBh0X2OSnZqIIE"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "379442482952-afdgjeahn7m6rou1b0ui5js2e7jo0g0j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "379442482952-64dp6vutr0eigonsemqdb9g9429qnu8q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nusantaraFood"
+              }
+            }
+          ]
         }
       }
     }

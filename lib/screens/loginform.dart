@@ -63,6 +63,11 @@ class _LoginformState extends State<Loginform> {
     return doc.data()?['nama'];
   }
 
+  Future<bool> isEmailVerified(User user) async {
+    await user.reload();
+    return user.emailVerified;
+  }
+
   void _login() async {
     setState(() {
       _emailError = '';
@@ -92,9 +97,17 @@ class _LoginformState extends State<Loginform> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+
       if (credential.user != null) {
-        String? userName = await fetchUserName(credential.user!.uid);
-        _showDialog('Berhasil', 'Login berhasil!', userName: userName);
+        bool emailVerified = await isEmailVerified(credential.user!);
+
+        if (!emailVerified) {
+          _showDialog('Gagal', 'Email belum diverifikasi. Silakan periksa email Anda untuk verifikasi.');
+          await credential.user!.sendEmailVerification();
+        } else {
+          String? userName = await fetchUserName(credential.user!.uid);
+          _showDialog('Berhasil', 'Login berhasil!', userName: userName);
+        }
       }
     } catch (e) {
       String errorMessage = 'Login gagal: ';

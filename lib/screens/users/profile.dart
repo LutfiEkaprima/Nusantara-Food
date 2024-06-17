@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nusantara_food/screens/users/pengaturan_screen/change_email.dart';
+import 'package:nusantara_food/screens/users/pengaturan_screen/change_password.dart';
 import 'package:nusantara_food/screens/users/pengaturan_screen/profile_edit.dart';
 import 'package:nusantara_food/screens/users/tambahresep.dart';
 import 'package:nusantara_food/screens/viewresep.dart';
@@ -59,23 +59,21 @@ class _ProfileScreenState extends State<ProfileScreen>
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(280.0),
         child: AppBar(
+          backgroundColor: const Color(0xFFFFFFED),
           automaticallyImplyLeading: false,
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
               onPressed: () async {
-                // Menunggu hasil dari ProfileEdit
                 final result = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
-
-                // Jika hasilnya true, maka fetch data terbaru
                 if (result == true) {
                   _fetchUserData();
                 }
@@ -287,7 +285,9 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
+        backgroundColor: const Color(0xFFFFFFED),
         title: const Text('Pengaturan'),
       ),
       body: ListView(
@@ -297,9 +297,8 @@ class SettingsPage extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Profil Saya'),
+            title: const Text('Edit Profil Saya'),
             onTap: () async {
-              // Menunggu hasil dari ProfileEdit
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const ProfileEdit()),
@@ -310,11 +309,11 @@ class SettingsPage extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.edit),
-            title: const Text('Ubah Email Akun'),
+            title: const Text('Ubah Password'),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ChangeEmail()),
+                MaterialPageRoute(builder: (context) => const ChangePasswordScreen()),
               );
             },
           ),

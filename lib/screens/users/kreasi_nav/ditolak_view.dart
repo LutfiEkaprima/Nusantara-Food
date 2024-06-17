@@ -53,6 +53,7 @@ class _DitolakViewState extends State<DitolakView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFFFED),
       body: FutureBuilder<QuerySnapshot>(
         future: _fetchDitolak(),
         builder: (context, snapshot) {
