@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nusantara_food/screens/admin/botnav.dart';
 import 'package:nusantara_food/screens/reset_password.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
@@ -30,7 +31,7 @@ class _LoginformState extends State<Loginform> {
     _passwordController.text = widget.password ?? '';
   }
 
-  void _showDialog(String title, String content, {String? userName}) {
+  void _showDialog(String title, String content, {String? userName, String? role}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -42,12 +43,28 @@ class _LoginformState extends State<Loginform> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (title == 'Berhasil') {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BottomNav(initialIndex: 0, userName: userName ?? ''),
-                    ),
-                  );
+                  if (role == 'admin') {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BottomNavadm(initialIndex: 0, userName: userName ?? ''),
+                      ),
+                    );
+                  } else if (role == 'user') {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BottomNav(initialIndex: 0, userName: userName ?? ''),
+                      ),
+                    );
+                  } else if (role == 'anonymous') {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BottomNav(initialIndex: 0, userName: userName ?? ''),
+                      ),
+                    );
+                  }
                 }
               },
               child: const Text('OK'),
@@ -58,9 +75,9 @@ class _LoginformState extends State<Loginform> {
     );
   }
 
-  Future<String?> fetchUserName(String uid) async {
+  Future<Map<String, dynamic>?> fetchUserDetails(String uid) async {
     final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return doc.data()?['nama'];
+    return doc.data();
   }
 
   Future<bool> isEmailVerified(User user) async {
@@ -105,8 +122,14 @@ class _LoginformState extends State<Loginform> {
           _showDialog('Gagal', 'Email belum diverifikasi. Silakan periksa email Anda untuk verifikasi.');
           await credential.user!.sendEmailVerification();
         } else {
-          String? userName = await fetchUserName(credential.user!.uid);
-          _showDialog('Berhasil', 'Login berhasil!', userName: userName);
+          final userDetails = await fetchUserDetails(credential.user!.uid);
+          if (userDetails != null) {
+            String? userName = userDetails['nama'];
+            String role = userDetails['role'];
+            _showDialog('Berhasil', 'Login berhasil!', userName: userName, role: role);
+          } else {
+            _showDialog('Gagal', 'User details not found.');
+          }
         }
       }
     } catch (e) {
@@ -122,6 +145,36 @@ class _LoginformState extends State<Loginform> {
         }
       }
       _showDialog('Gagal', errorMessage);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _loginAnonymously() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final credential = await FirebaseAuth.instance.signInAnonymously();
+
+      if (credential.user != null) {
+        // Create a Firestore entry for the anonymous user
+        await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).set({
+          'uid': credential.user!.uid,
+          'role': 'anonymous',
+          'nama': 'Guest',
+          'deskripsi': '',
+          'fotoProfil': 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
+          'favoriteFood': [],
+        });
+
+        _showDialog('Berhasil', 'Login sebagai tamu berhasil!', userName: 'Guest', role: 'anonymous');
+      }
+    } catch (e) {
+      _showDialog('Gagal', 'Login gagal: ${e.toString()}');
     } finally {
       setState(() {
         _isLoading = false;
@@ -236,6 +289,14 @@ class _LoginformState extends State<Loginform> {
                     onPressed: _navigateToResetPassword,
                     child: Text(
                       'Lupa Password?',
+                      style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: _loginAnonymously,
+                    child: Text(
+                      'Masuk sebagai Tamu',
                       style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
                     ),
                   ),

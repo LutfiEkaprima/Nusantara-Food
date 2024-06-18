@@ -151,6 +151,7 @@ class _DaftarFormState extends State<DaftarForm> {
           'deskripsi': '',
           'fotoProfil': 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
           'favoriteFood': [],
+          'role' : 'user',
         });
 
         await _sendEmailVerification(userCredential.user!);

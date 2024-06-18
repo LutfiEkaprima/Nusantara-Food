@@ -6,16 +6,16 @@ import 'package:nusantara_food/utils.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreenadm extends StatefulWidget {
   final String userName;
 
-  const HomeScreen({super.key, required this.userName});
+  const HomeScreenadm({super.key, required this.userName});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeScreenadmState createState() => _HomeScreenadmState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenadmState extends State<HomeScreenadm> {
   List<Map<String, dynamic>> allRecipes = [];
   List<Map<String, dynamic>> breakfastRecipes = [];
   List<Map<String, dynamic>> lunchRecipes = [];
