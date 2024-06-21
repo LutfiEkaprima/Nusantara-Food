@@ -11,7 +11,7 @@ class Loginform extends StatefulWidget {
   final String? email;
   final String? password;
 
-  const Loginform({super.key, this.email, this.password});
+  const Loginform({Key? key, this.email, this.password}) : super(key: key);
 
   @override
   _LoginformState createState() => _LoginformState();
@@ -75,9 +75,22 @@ class _LoginformState extends State<Loginform> {
     );
   }
 
-  Future<Map<String, dynamic>?> fetchUserDetails(String uid) async {
-    final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    return doc.data();
+  Future<Map<String, dynamic>?> fetchUserDetails(String email) async {
+    final userQuery = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: email).get();
+    if (userQuery.docs.isNotEmpty) {
+      return userQuery.docs.first.data();
+    } else {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchAdminDetails(String email) async {
+    final adminQuery = await FirebaseFirestore.instance.collection('admin').where('email', isEqualTo: email).get();
+    if (adminQuery.docs.isNotEmpty) {
+      return adminQuery.docs.first.data();
+    } else {
+      return null;
+    }
   }
 
   Future<bool> isEmailVerified(User user) async {
@@ -122,13 +135,24 @@ class _LoginformState extends State<Loginform> {
           _showDialog('Gagal', 'Email belum diverifikasi. Silakan periksa email Anda untuk verifikasi.');
           await credential.user!.sendEmailVerification();
         } else {
-          final userDetails = await fetchUserDetails(credential.user!.uid);
+          final userDetails = await fetchUserDetails(_emailController.text);
           if (userDetails != null) {
             String? userName = userDetails['nama'];
             String role = userDetails['role'];
-            _showDialog('Berhasil', 'Login berhasil!', userName: userName, role: role);
+
+            if (role == 'admin') {
+              _showDialog('Berhasil', 'Login berhasil sebagai admin!', userName: userName, role: role);
+            } else {
+              _showDialog('Berhasil', 'Login berhasil!', userName: userName, role: role);
+            }
           } else {
-            _showDialog('Gagal', 'User details not found.');
+            final adminDetails = await fetchAdminDetails(_emailController.text);
+            if (adminDetails != null) {
+              String? adminName = adminDetails['nama'];
+              _showDialog('Berhasil', 'Login berhasil sebagai admin!', userName: adminName, role: 'admin');
+            } else {
+              _showDialog('Gagal', 'Pengguna tidak ditemukan.');
+            }
           }
         }
       }

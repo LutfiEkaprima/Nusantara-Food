@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DitinjauView extends StatefulWidget {
@@ -49,21 +50,53 @@ class _DitinjauViewState extends State<DitinjauView> {
     });
   }
 
-  Future<void> _cancelSubmission(String docId) async {
+  Future<void> _updateRecipeStatus(String docId, String status) async {
     try {
-      await _firestore.collection('resep').doc(docId).update({'status': 'batal'});
+      if (status == 'diterima') {
+        await _firestore.collection('resep').doc(docId).update({
+          'status': status,
+          'rating': 0,
+          'comments': [],
+        });
+      } else {
+        await _firestore.collection('resep').doc(docId).update({'status': status});
+      }
     } catch (error) {
-      print('Error cancelling submission: $error');
+      print('Error updating recipe status: $error');
     }
   }
 
-  void _showCancelDialog(String docId) {
+  void _showActionDialog(String docId, String action) {
+    String title;
+    String content;
+    String newStatus;
+
+    switch (action) {
+      case 'Batalkan Pengajuan':
+        title = 'Batalkan Pengajuan';
+        content = 'Apakah Anda yakin ingin membatalkan pengajuan ini?';
+        newStatus = 'batal';
+        break;
+      case 'Setujui Resep':
+        title = 'Setujui Resep';
+        content = 'Apakah Anda yakin ingin menyetujui resep ini?';
+        newStatus = 'disetujui';
+        break;
+      case 'Tolak Resep':
+        title = 'Tolak Resep';
+        content = 'Apakah Anda yakin ingin menolak resep ini?';
+        newStatus = 'ditolak';
+        break;
+      default:
+        return;
+    }
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Batalkan Pengajuan'),
-          content: Text('Apakah Anda yakin ingin membatalkan pengajuan ini?'),
+          title: Text(title),
+          content: Text(content),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -71,7 +104,7 @@ class _DitinjauViewState extends State<DitinjauView> {
             ),
             TextButton(
               onPressed: () {
-                _cancelSubmission(docId);
+                _updateRecipeStatus(docId, newStatus);
                 Navigator.of(context).pop();
                 _fetchData();
               },
@@ -110,19 +143,17 @@ class _DitinjauViewState extends State<DitinjauView> {
                 final data = documents[index].data() as Map<String, dynamic>;
                 return ListTile(
                   title: Text(data['title'], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  subtitle: Text(data['time']+ ' Menit', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200)),
+                  subtitle: Text(data['time'] + ' Menit', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.circle, color: Colors.yellow, size: 12),
                       PopupMenuButton<String>(
                         onSelected: (value) {
-                          if (value == 'Batalkan Pengajuan') {
-                            _showCancelDialog(documents[index].id);
-                          }
+                          _showActionDialog(documents[index].id, value);
                         },
                         itemBuilder: (BuildContext context) {
-                          return {'Batalkan Pengajuan'}
+                          return {'Setujui Resep', 'Tolak Resep'}
                               .map((String choice) {
                             return PopupMenuItem<String>(
                               value: choice,
@@ -133,6 +164,14 @@ class _DitinjauViewState extends State<DitinjauView> {
                       ),
                     ],
                   ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewResep(docId: documents[index].id),
+                      ),
+                    );
+                  },
                 );
               },
             ),

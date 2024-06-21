@@ -14,12 +14,13 @@ class ViewResep extends StatefulWidget {
 }
 
 class _ViewResepState extends State<ViewResep> {
-  final List<String> comments = [];
   final TextEditingController commentController = TextEditingController();
   double userRating = 0.0;
   Map<String, dynamic>? _userData;
 
   DocumentSnapshot? resepData;
+  List<dynamic> comments = [];
+  double averageRating = 0.0;
 
   @override
   void initState() {
@@ -47,15 +48,87 @@ class _ViewResepState extends State<ViewResep> {
     return null;
   }
 
-
   Future<void> fetchData() async {
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('resep').doc(widget.docId).get();
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('resep')
+          .doc(widget.docId)
+          .get();
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      QuerySnapshot ratingsSnapshot =
+          await doc.reference.collection('ratings').get();
+      Map<String, dynamic> ratings = {
+        for (var doc in ratingsSnapshot.docs) doc.id: doc.data(),
+      };
+
       setState(() {
         resepData = doc;
+        comments = List<Map<String, dynamic>>.from(data['comments'] ?? []);
+        userRating = ratings.containsKey(FirebaseAuth.instance.currentUser?.uid)
+            ? (ratings[FirebaseAuth.instance.currentUser!.uid]
+                    as Map<String, dynamic>)['rating']
+                .toDouble()
+            : 0.0;
       });
     } catch (e) {
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<void> submitComment() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && commentController.text.isNotEmpty) {
+      // Create the comment with a temporary timestamp
+      final comment = {
+        'text': commentController.text,
+        'userId': user.uid,
+        'userName': _userData?['name'] ?? 'Anonymous',
+        'timestamp': FieldValue.serverTimestamp(), // Correct usage here
+      };
+
+      // Add the comment to Firestore
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('resep').doc(widget.docId);
+      await docRef.update({
+        'comments': FieldValue.arrayUnion([comment]),
+      });
+
+      // Clear the comment controller and refresh the state
+      setState(() {
+        commentController.clear();
+        fetchData();
+      });
+    }
+  }
+
+  Future<void> submitRating(double rating) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference docRef =
+          FirebaseFirestore.instance.collection('resep').doc(widget.docId);
+      CollectionReference ratingsRef = docRef.collection('ratings');
+
+      DocumentSnapshot userRatingSnapshot =
+          await ratingsRef.doc(user.uid).get();
+
+      if (!userRatingSnapshot.exists) {
+        await ratingsRef.doc(user.uid).set({'rating': rating});
+
+        // Recalculate the overall rating
+        QuerySnapshot ratingsSnapshot = await ratingsRef.get();
+        double totalRating = ratingsSnapshot.docs.fold(0.0,
+            (sum, doc) => sum + (doc.data() as Map<String, dynamic>)['rating']);
+        double overallRating = totalRating / ratingsSnapshot.size;
+
+        await docRef.update({'overallRating': overallRating});
+
+        setState(() {
+          userRating = rating;
+        });
+      } else {
+        print('User has already rated');
+      }
     }
   }
 
@@ -77,7 +150,10 @@ class _ViewResepState extends State<ViewResep> {
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFED),
-        title: Text(data['title'], style: textStyle(20, Colors.black, FontWeight.bold),),
+        title: Text(
+          data['title'],
+          style: textStyle(20, Colors.black, FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -91,17 +167,16 @@ class _ViewResepState extends State<ViewResep> {
             children: [
               Center(
                 child: Image.network(
-                  data['imageUrl'] ?? 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
+                  data['imageUrl'] ??
+                      'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
                   height: 500,
                   width: 500,
                   fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 16.0),
-              Text(
-                data['title'],
-                style: textStyle(20, Colors.black, FontWeight.bold)
-              ),
+              Text(data['title'],
+                  style: textStyle(20, Colors.black, FontWeight.bold)),
               const SizedBox(height: 8.0),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -152,9 +227,10 @@ class _ViewResepState extends State<ViewResep> {
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundImage: _userData?['fotoProfil'] != null
-                    ? NetworkImage(_userData!['fotoProfil']) 
-                    : null,
+                      backgroundImage: NetworkImage(
+                        _userData?['fotoProfil'] ??
+                            'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
+                      ),
                     ),
                     SizedBox(width: 8.0),
                     Column(
@@ -175,7 +251,7 @@ class _ViewResepState extends State<ViewResep> {
                             Icon(Icons.star, color: Colors.yellow),
                             Icon(Icons.star_border),
                             SizedBox(width: 8.0),
-                            Text('4.0'),
+                            Text('${averageRating.toStringAsFixed(1)}'),
                           ],
                         ),
                       ],
@@ -226,7 +302,9 @@ class _ViewResepState extends State<ViewResep> {
                           Container(
                             height: 200,
                             color: Colors.grey[300],
-                            child: (data['stepImages'] != null && data['stepImages'].length > index && data['stepImages'][index] != null)
+                            child: (data['stepImages'] != null &&
+                                    data['stepImages'].length > index &&
+                                    data['stepImages'][index] != null)
                                 ? Image.network(data['stepImages'][index])
                                 : null,
                           ),
@@ -280,10 +358,11 @@ class _ViewResepState extends State<ViewResep> {
                     child: Row(
                       children: [
                         const CircleAvatar(
-                          backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Placeholder avatar image
+                          backgroundImage:
+                              NetworkImage('https://via.placeholder.com/150'),
                         ),
                         const SizedBox(width: 8.0),
-                        Expanded(child: Text(comment)),
+                        Expanded(child: Text(comment['text'])),
                       ],
                     ),
                   );
@@ -312,14 +391,7 @@ class _ViewResepState extends State<ViewResep> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (commentController.text.isNotEmpty) {
-                              comments.add(commentController.text);
-                              commentController.clear();
-                            }
-                          });
-                        },
+                        onPressed: submitComment,
                         child: const Text('Submit'),
                       ),
                     ),
@@ -341,9 +413,7 @@ class _ViewResepState extends State<ViewResep> {
                       color: Colors.yellow,
                     ),
                     onPressed: () {
-                      setState(() {
-                        userRating = index + 1.0;
-                      });
+                      submitRating(index + 1.0);
                     },
                   );
                 }),

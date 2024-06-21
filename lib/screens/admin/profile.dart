@@ -40,7 +40,7 @@ class _ProfileScreenadmState extends State<ProfileScreenadm>
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final doc = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('admin')
           .doc(user.uid)
           .get();
       return doc.data();

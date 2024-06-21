@@ -100,19 +100,6 @@ class LoginPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  RichText(
-                    text: TextSpan(
-                      text: 'Masuk sebagai ',
-                      style: textStyle(14, const Color(0xFF035444), FontWeight.w800),
-                      children: [
-                        TextSpan(
-                          text: 'Tamu',
-                          style: textStyle(14, const Color(0xFF035444), FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               );
             },
