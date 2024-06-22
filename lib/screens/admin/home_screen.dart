@@ -17,15 +17,18 @@ class HomeScreenadm extends StatefulWidget {
 
 class _HomeScreenadmState extends State<HomeScreenadm> {
   List<Map<String, dynamic>> allRecipes = [];
+  List<Map<String, dynamic>> filteredRecipes = [];
   List<Map<String, dynamic>> breakfastRecipes = [];
   List<Map<String, dynamic>> lunchRecipes = [];
   List<Map<String, dynamic>> dinnerRecipes = [];
   bool _isLoading = true;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     fetchApprovedRecipes();
+    _searchController.addListener(_searchRecipes);
   }
 
   Future<void> fetchApprovedRecipes() async {
@@ -41,6 +44,8 @@ class _HomeScreenadmState extends State<HomeScreenadm> {
           return data;
         }).toList();
 
+        filteredRecipes = allRecipes;
+
         breakfastRecipes.clear();
         lunchRecipes.clear();
         dinnerRecipes.clear();
@@ -48,13 +53,23 @@ class _HomeScreenadmState extends State<HomeScreenadm> {
         for (var recipe in allRecipes) {
           List<String> categories =
               List<String>.from(recipe['categories'] ?? []);
-          if (categories.contains('sarapan')) {
+
+          if (categories.contains('sarapan') ||
+              categories.contains('SARAPAN') ||
+              categories.contains('Makan Pagi') ||
+              categories.contains('MAKAN PAGI')) {
             breakfastRecipes.add(recipe);
           }
-          if (categories.contains('makan siang')) {
+
+          if (categories.contains('makan siang') ||
+              categories.contains('MAKAN SIANG') ||
+              categories.contains('Makan Siang')) {
             lunchRecipes.add(recipe);
           }
-          if (categories.contains('makan malam')) {
+
+          if (categories.contains('makan malam') ||
+              categories.contains('MAKAN MALAM') ||
+              categories.contains('Makan Malam')) {
             dinnerRecipes.add(recipe);
           }
         }
@@ -66,6 +81,16 @@ class _HomeScreenadmState extends State<HomeScreenadm> {
         _isLoading = false;
       });
     }
+  }
+
+  void _searchRecipes() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredRecipes = allRecipes.where((recipe) {
+        String title = recipe['title']?.toLowerCase() ?? '';
+        return title.contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -112,6 +137,7 @@ class _HomeScreenadmState extends State<HomeScreenadm> {
                   ),
                   const SizedBox(height: 16.0),
                   TextField(
+                    controller: _searchController,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: 'Cari Resep',
@@ -134,7 +160,7 @@ class _HomeScreenadmState extends State<HomeScreenadm> {
             children: [
               Section(
                 title: 'MENU HARI INI',
-                recipes: allRecipes,
+                recipes: filteredRecipes,
               ),
               Section(
                 title: 'MENU SARAPAN',
@@ -187,7 +213,7 @@ class Section extends StatelessWidget {
                     recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
                 final title = recipe['title'] ?? 'No title';
                 final publisherName = recipe['publisherName'] ?? 'Unknown';
-                final rating = recipe['overallRating']?.toString() ?? 'N/A';
+                final rating = recipe['overallRating']?.toString() ?? '0.0';
 
                 final truncatedPublisherName = publisherName.length > 10
                     ? publisherName.substring(0, 15) + '...'

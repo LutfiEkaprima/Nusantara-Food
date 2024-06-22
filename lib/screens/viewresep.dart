@@ -17,6 +17,7 @@ class _ViewResepState extends State<ViewResep> {
   final TextEditingController commentController = TextEditingController();
   double userRating = 0.0;
   Map<String, dynamic>? _userData;
+  Map<String, dynamic>? _publisherData;
 
   DocumentSnapshot? resepData;
   List<dynamic> comments = [];
@@ -55,6 +56,14 @@ class _ViewResepState extends State<ViewResep> {
           .doc(widget.docId)
           .get();
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      if (data['userId'] != null) {
+        DocumentSnapshot publisherDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(data['userId'])
+            .get();
+        _publisherData = publisherDoc.data() as Map<String, dynamic>?;
+      }
 
       QuerySnapshot commentsSnapshot =
           await doc.reference.collection('comments').orderBy('timestamp').get();
@@ -151,8 +160,8 @@ class _ViewResepState extends State<ViewResep> {
           }
         });
 
-        double overallRating =
-            ratingCount > 0 ? totalRating / ratingCount : 0.0;
+        double overallRating = (data['overallRating'] != null) ? data['overallRating'] : 0.0;
+        overallRating = ratingCount > 0 ? totalRating / ratingCount : 0.0;
 
         await docRef.update({
           'ratings': ratings,
@@ -265,7 +274,7 @@ class _ViewResepState extends State<ViewResep> {
                     CircleAvatar(
                       radius: 30,
                       backgroundImage: NetworkImage(
-                        _userData?['fotoProfil'] ??
+                        _publisherData?['fotoProfil'] ??
                             'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
                       ),
                     ),
@@ -284,7 +293,7 @@ class _ViewResepState extends State<ViewResep> {
                           children: [
                             ...List.generate(5, (index) {
                               return Icon(
-                                index < data['overallRating']
+                                index < (data['overallRating'] ?? 0.0)
                                     ? Icons.star
                                     : Icons.star_border,
                                 color: Colors.yellow,
@@ -292,7 +301,8 @@ class _ViewResepState extends State<ViewResep> {
                             }),
                             const SizedBox(width: 8.0),
                             Text(
-                                '${data['overallRating'].toStringAsFixed(1)}'),
+                              '${(data['overallRating'] ?? 0.0).toStringAsFixed(1)}',
+                            ),
                           ],
                         ),
                       ],

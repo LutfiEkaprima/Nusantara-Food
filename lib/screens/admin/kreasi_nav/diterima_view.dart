@@ -62,12 +62,12 @@ class _DiterimaViewState extends State<DiterimaView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Hapus Resep'),
-          content: Text('Apakah Anda yakin ingin menghapus resep ini?'),
+          title: const Text('Hapus Resep'),
+          content: const Text('Apakah Anda yakin ingin menghapus resep ini?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tidak'),
+              child: const Text('Tidak'),
             ),
             TextButton(
               onPressed: () {
@@ -75,7 +75,7 @@ class _DiterimaViewState extends State<DiterimaView> {
                 Navigator.of(context).pop();
                 _fetchData();
               },
-              child: Text('Ya'),
+              child: const Text('Ya'),
             ),
           ],
         );
@@ -114,7 +114,7 @@ class _DiterimaViewState extends State<DiterimaView> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.circle, color: Colors.green, size: 12),
+                      const Icon(Icons.circle, color: Colors.green, size: 12),
                       PopupMenuButton<String>(
                         onSelected: (value) {
                           if (value == 'Hapus Resep') {

@@ -55,8 +55,6 @@ class _DitinjauViewState extends State<DitinjauView> {
       if (status == 'diterima') {
         await _firestore.collection('resep').doc(docId).update({
           'status': status,
-          'rating': 0,
-          'comments': [],
         });
       } else {
         await _firestore.collection('resep').doc(docId).update({'status': status});
@@ -131,7 +129,7 @@ class _DitinjauViewState extends State<DitinjauView> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Tidak ada resep yang ditinjau', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200)));
+            return const Center(child: Text('Tidak Pengajuan Resep', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200)));
           }
 
           final List<DocumentSnapshot> documents = snapshot.data!.docs;

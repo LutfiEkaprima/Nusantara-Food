@@ -154,6 +154,7 @@ class _TambahResepState extends State<TambahResep> {
         'createdAt': FieldValue
             .serverTimestamp(),
         'imageUrl': imageUrl,
+        'overallRating': 0.0,
       };
 
       if (widget.draft != null) {
