@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nusantara_food/screens/admin/pengaturan_screen/change_password.dart';
-import 'package:nusantara_food/screens/admin/pengaturan_screen/profile_edit.dart';
-import 'package:nusantara_food/screens/admin/tambahresep.dart';
-import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
@@ -24,7 +20,7 @@ class _ProfileScreenadmState extends State<ProfileScreenadm>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
     _fetchUserData();
   }
 
@@ -100,22 +96,11 @@ class _ProfileScreenadmState extends State<ProfileScreenadm>
                     controller: _tabController,
                     labelStyle: textStyle(14, Colors.black, FontWeight.w600),
                     tabs: const [
-                      Tab(text: 'About 123'),
-                      Tab(text: 'Resep Saya'),
+                      Tab(text: 'About'),
                     ],
                   ),
                 ],
               ),
-            ),
-          ),
-          body: LoadingState(
-            isLoading: _isLoading,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                AboutTab(userData: _userData),
-                const ResepSayaTab(),
-              ],
             ),
           ),
         )
@@ -162,130 +147,6 @@ class AboutTab extends StatelessWidget {
   }
 }
 
-class ResepSayaTab extends StatefulWidget {
-  const ResepSayaTab({super.key});
-
-  @override
-  _ResepSayaTabState createState() => _ResepSayaTabState();
-}
-
-class _ResepSayaTabState extends State<ResepSayaTab> {
-  List<Map<String, dynamic>> userRecipes = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchUserRecipes();
-  }
-
-  Future<void> fetchUserRecipes() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('resep')
-            .where('userId', isEqualTo: user.uid)
-            .where('status', isEqualTo: 'disetujui')
-            .get();
-        setState(() {
-          userRecipes = snapshot.docs.map((doc) {
-            var data = doc.data() as Map<String, dynamic>;
-            data['docId'] = doc.id;
-            return data;
-          }).toList();
-        });
-      }
-    } catch (e) {
-      print('Error fetching user recipes: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LoadingState(
-      isLoading: _isLoading,
-      child: userRecipes.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.book,
-                    size: 100,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'No recipes yet! 123',
-                    style: textStyle(18, Colors.black, FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Start adding your favorite recipes here.',
-                    textAlign: TextAlign.center,
-                    style: textStyle(16, Colors.grey, FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const TambahResep()),
-                      );
-                    },
-                    child: const Text('Add Recipe'),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: userRecipes.length,
-              itemBuilder: (context, index) {
-                final recipe = userRecipes[index];
-                final imageUrl =
-                    recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
-                final title = recipe['title'] ?? 'No title';
-                final publisherName = recipe['publisherName'] ?? 'Unknown';
-                final rating = recipe['rating']?.toString() ?? 'N/A';
-
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ViewResep(docId: recipe['docId'])),
-                    );
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      leading: Image.network(
-                        imageUrl,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                      ),
-                      title: Text(title,
-                          style: textStyle(16, Colors.black, FontWeight.w600)),
-                      subtitle: Text('By $publisherName\nRating: $rating'),
-                      isThreeLine: true,
-                    ),
-                  ),
-                );
-              },
-            ),
-    );
-  }
-}
-
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
@@ -302,40 +163,6 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
-          const ListTile(
-            title: Text('Kelola Akun',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: Text(
-              'Edit Profil Saya',
-              style: textStyle(16, Colors.black, FontWeight.w500),
-            ),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileEdit()),
-              );
-
-              Navigator.pop(context, result);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: Text(
-              'Ubah Password',
-              style: textStyle(16, Colors.black, FontWeight.w500),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ChangePasswordScreen()),
-              );
-            },
-          ),
-          const Divider(),
           const ListTile(
             title: Text('Info Lainnya',
                 style: TextStyle(fontWeight: FontWeight.bold)),

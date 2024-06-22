@@ -56,20 +56,38 @@ class _ViewResepState extends State<ViewResep> {
           .get();
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
+      QuerySnapshot commentsSnapshot =
+          await doc.reference.collection('comments').orderBy('timestamp').get();
+      List<Map<String, dynamic>> commentsList = commentsSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
       QuerySnapshot ratingsSnapshot =
           await doc.reference.collection('ratings').get();
-      Map<String, dynamic> ratings = {
-        for (var doc in ratingsSnapshot.docs) doc.id: doc.data(),
-      };
+      List<Map<String, dynamic>> ratingsList = ratingsSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      double totalRating = 0.0;
+      int ratingCount = ratingsList.length;
+      double initialUserRating = 0.0;
+
+      for (var rating in ratingsList) {
+        if (rating.containsKey('rating')) {
+          totalRating += rating['rating'];
+        }
+        if (rating['userId'] == FirebaseAuth.instance.currentUser?.uid) {
+          initialUserRating = rating['rating'].toDouble();
+        }
+      }
+
+      double overallRating = ratingCount > 0 ? totalRating / ratingCount : 0.0;
 
       setState(() {
         resepData = doc;
-        comments = List<Map<String, dynamic>>.from(data['comments'] ?? []);
-        userRating = ratings.containsKey(FirebaseAuth.instance.currentUser?.uid)
-            ? (ratings[FirebaseAuth.instance.currentUser!.uid]
-                    as Map<String, dynamic>)['rating']
-                .toDouble()
-            : 0.0;
+        comments = commentsList;
+        userRating = initialUserRating;
+        averageRating = overallRating;
       });
     } catch (e) {
       print('Error fetching data: $e');
@@ -79,26 +97,34 @@ class _ViewResepState extends State<ViewResep> {
   Future<void> submitComment() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && commentController.text.isNotEmpty) {
-      // Create the comment with a temporary timestamp
       final comment = {
         'text': commentController.text,
         'userId': user.uid,
-        'userName': _userData?['name'] ?? 'Anonymous',
-        'timestamp': FieldValue.serverTimestamp(), // Correct usage here
+        'userName': _userData?['nama'] ?? 'Anonymous',
+        'timestamp': FieldValue.serverTimestamp(),
       };
 
-      // Add the comment to Firestore
       DocumentReference docRef =
           FirebaseFirestore.instance.collection('resep').doc(widget.docId);
-      await docRef.update({
-        'comments': FieldValue.arrayUnion([comment]),
-      });
 
-      // Clear the comment controller and refresh the state
-      setState(() {
-        commentController.clear();
-        fetchData();
-      });
+      try {
+        CollectionReference commentsRef = docRef.collection('comments');
+        DocumentReference newCommentRef = await commentsRef.add(comment);
+        DocumentSnapshot newCommentSnapshot = await newCommentRef.get();
+
+        setState(() {
+          comments.add({
+            'text': commentController.text,
+            'userId': user.uid,
+            'userName': _userData?['nama'] ?? 'Anonymous',
+            'timestamp': Timestamp.now(),
+          });
+          commentController.clear();
+          print(_userData?['nama']);
+        });
+      } catch (e) {
+        print('Error submitting comment: $e');
+      }
     }
   }
 
@@ -107,27 +133,38 @@ class _ViewResepState extends State<ViewResep> {
     if (user != null) {
       DocumentReference docRef =
           FirebaseFirestore.instance.collection('resep').doc(widget.docId);
-      CollectionReference ratingsRef = docRef.collection('ratings');
 
-      DocumentSnapshot userRatingSnapshot =
-          await ratingsRef.doc(user.uid).get();
+      try {
+        DocumentSnapshot docSnapshot = await docRef.get();
+        Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> ratings = data['ratings'] ?? {};
 
-      if (!userRatingSnapshot.exists) {
-        await ratingsRef.doc(user.uid).set({'rating': rating});
+        ratings[user.uid] = {'rating': rating};
 
-        // Recalculate the overall rating
-        QuerySnapshot ratingsSnapshot = await ratingsRef.get();
-        double totalRating = ratingsSnapshot.docs.fold(0.0,
-            (sum, doc) => sum + (doc.data() as Map<String, dynamic>)['rating']);
-        double overallRating = totalRating / ratingsSnapshot.size;
+        double totalRating = 0.0;
+        int ratingCount = 0;
 
-        await docRef.update({'overallRating': overallRating});
+        ratings.forEach((key, value) {
+          if (value is Map && value.containsKey('rating')) {
+            totalRating += value['rating'];
+            ratingCount++;
+          }
+        });
+
+        double overallRating =
+            ratingCount > 0 ? totalRating / ratingCount : 0.0;
+
+        await docRef.update({
+          'ratings': ratings,
+          'overallRating': overallRating,
+        });
 
         setState(() {
           userRating = rating;
+          averageRating = overallRating;
         });
-      } else {
-        print('User has already rated');
+      } catch (e) {
+        print('Error submitting rating: $e');
       }
     }
   }
@@ -135,7 +172,7 @@ class _ViewResepState extends State<ViewResep> {
   @override
   Widget build(BuildContext context) {
     if (resepData == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
         ),
@@ -184,32 +221,32 @@ class _ViewResepState extends State<ViewResep> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.access_time),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.access_time),
+                        const SizedBox(width: 4.0),
                         Text('${data['time']} Menit'),
                       ],
                     ),
-                    SizedBox(width: 16.0),
+                    const SizedBox(width: 16.0),
                     Row(
                       children: [
-                        Icon(Icons.people),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.people),
+                        const SizedBox(width: 4.0),
                         Text('Porsi untuk ${data['portion']} orang'),
                       ],
                     ),
-                    SizedBox(width: 16.0),
+                    const SizedBox(width: 16.0),
                     Row(
                       children: [
-                        Icon(Icons.attach_money),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.attach_money),
+                        const SizedBox(width: 4.0),
                         Text('Rp. ${data['cost']}'),
                       ],
                     ),
-                    SizedBox(width: 16.0),
+                    const SizedBox(width: 16.0),
                     Row(
                       children: [
-                        Icon(Icons.verified),
-                        SizedBox(width: 4.0),
+                        const Icon(Icons.verified),
+                        const SizedBox(width: 4.0),
                         Text(data['recipeType'] ?? 'null'),
                       ],
                     ),
@@ -232,7 +269,7 @@ class _ViewResepState extends State<ViewResep> {
                             'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
                       ),
                     ),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -240,18 +277,22 @@ class _ViewResepState extends State<ViewResep> {
                           data['publisherName'] ?? 'Anonymous',
                           style: textStyle(16, Colors.black, FontWeight.w600),
                         ),
-                        SizedBox(height: 4.0),
+                        const SizedBox(height: 4.0),
                         Text('Tanggal Upload: $formattedDate'),
-                        SizedBox(height: 4.0),
+                        const SizedBox(height: 4.0),
                         Row(
                           children: [
-                            Icon(Icons.star, color: Colors.yellow),
-                            Icon(Icons.star, color: Colors.yellow),
-                            Icon(Icons.star, color: Colors.yellow),
-                            Icon(Icons.star, color: Colors.yellow),
-                            Icon(Icons.star_border),
-                            SizedBox(width: 8.0),
-                            Text('${averageRating.toStringAsFixed(1)}'),
+                            ...List.generate(5, (index) {
+                              return Icon(
+                                index < data['overallRating']
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                color: Colors.yellow,
+                              );
+                            }),
+                            const SizedBox(width: 8.0),
+                            Text(
+                                '${data['overallRating'].toStringAsFixed(1)}'),
                           ],
                         ),
                       ],
@@ -342,64 +383,6 @@ class _ViewResepState extends State<ViewResep> {
               ),
               const SizedBox(height: 16.0),
               Text(
-                'Komentar',
-                style: textStyle(16, Colors.black, FontWeight.bold),
-              ),
-              const SizedBox(height: 8.0),
-              Column(
-                children: comments.map((comment) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8.0),
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundImage:
-                              NetworkImage('https://via.placeholder.com/150'),
-                        ),
-                        const SizedBox(width: 8.0),
-                        Expanded(child: Text(comment['text'])),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8.0),
-              Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: commentController,
-                      decoration: InputDecoration(
-                        hintText: 'Tambahkan komentar...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 8.0),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: submitComment,
-                        child: const Text('Submit'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              Text(
                 'Beri Rating',
                 style: textStyle(16, Colors.black, FontWeight.bold),
               ),
@@ -417,6 +400,67 @@ class _ViewResepState extends State<ViewResep> {
                     },
                   );
                 }),
+              ),
+              const SizedBox(height: 16.0),
+              Text('Komentar:', style: textStyle(18, Colors.black, FontWeight.bold)),
+              const SizedBox(height: 8.0),
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: commentController,
+                      decoration: InputDecoration(
+                        labelText: 'Tulis komentar...',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: submitComment,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Column(
+                      children: List.generate(
+                        comments.length,
+                        (index) {
+                          Map<String, dynamic> comment = comments[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(
+                                    'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',
+                                  ),
+                                ),
+                                const SizedBox(width: 8.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        comment['userName'],
+                                        style: textStyle(14, Colors.black, FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 4.0),
+                                      Text(comment['text']),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16.0),
             ],

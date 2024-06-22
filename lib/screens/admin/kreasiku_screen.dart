@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nusantara_food/screens/admin/kreasi_nav/diterima_view.dart';
 import 'package:nusantara_food/screens/admin/kreasi_nav/ditinjau_view.dart';
 import 'package:nusantara_food/screens/admin/kreasi_nav/ditolak_view.dart';
-import 'package:nusantara_food/screens/admin/tambahresep.dart';
-
 class KreasikuScreenadm extends StatelessWidget {
   const KreasikuScreenadm({super.key});
 
@@ -35,16 +33,6 @@ class KreasikuScreenadm extends StatelessWidget {
             DiterimaView(),
             DitolakView(),
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TambahResep()),
-          );
-          },
-          backgroundColor: Colors.green,
-          child: const Icon(Icons.add),
         ),
       ),
     );

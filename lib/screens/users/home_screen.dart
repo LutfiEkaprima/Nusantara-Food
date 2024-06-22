@@ -187,7 +187,7 @@ class Section extends StatelessWidget {
                     recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
                 final title = recipe['title'] ?? 'No title';
                 final publisherName = recipe['publisherName'] ?? 'Unknown';
-                final rating = recipe['rating']?.toString() ?? 'N/A';
+                final rating = recipe['overallRating']?.toString() ?? 'N/A';
 
                 final truncatedPublisherName = publisherName.length > 10
                     ? publisherName.substring(0, 15) + '...'

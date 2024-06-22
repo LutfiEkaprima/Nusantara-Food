@@ -20,7 +20,6 @@ class _DiterimaViewState extends State<DiterimaView> {
     if (user != null) {
       return await _firestore
           .collection('resep')
-          .where('userId', isEqualTo: user.uid)
           .where('status', isEqualTo: 'disetujui')
           .get();
     } else {
