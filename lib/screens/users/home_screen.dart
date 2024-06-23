@@ -210,12 +210,12 @@ class Section extends StatelessWidget {
                 final recipe = recipes[index];
 
                 final imageUrl =
-                    recipe['imageUrl'] ?? 'https://via.placeholder.com/150';
+                    recipe['imageUrl'] ?? 'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82';
                 final title = recipe['title'] ?? 'No title';
                 final publisherName = recipe['publisherName'] ?? 'Unknown';
                 final rating = recipe['overallRating']?.toString() ?? 'N/A';
 
-                final truncatedPublisherName = publisherName.length > 10
+                final truncatedPublisherName = publisherName.length > 15
                     ? publisherName.substring(0, 15) + '...'
                     : publisherName;
 
