@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusantara_food/providers/save_resep_provider.dart';
 import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
@@ -7,9 +8,7 @@ import 'package:nusantara_food/widgets/loadingstate.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String userName;
-
-  const HomeScreen({super.key, required this.userName});
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -23,12 +22,31 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> dinnerRecipes = [];
   bool _isLoading = true;
   TextEditingController _searchController = TextEditingController();
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
     fetchApprovedRecipes();
+    _fetchUserName();
     _searchController.addListener(_searchRecipes);
+  }
+
+  Future<void> _fetchUserName() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        setState(() {
+          _userName = userDoc['nama'] ?? 'User';
+        });
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+    }
   }
 
   Future<void> fetchApprovedRecipes() async {
@@ -124,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Halo, ${widget.userName}',
+                            'Halo, $_userName',
                             style: textStyle(14, Colors.black, FontWeight.bold),
                           ),
                           Text(

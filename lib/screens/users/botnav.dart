@@ -28,7 +28,7 @@ class _BottomNavState extends State<BottomNav> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      HomeScreen(userName: widget.userName),
+      HomeScreen(),
       const KreasikuScreen(),
       const ResepScreen(),
       const ProfileScreen(),

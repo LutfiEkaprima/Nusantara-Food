@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nusantara_food/screens/admin/botnav.dart';
 import 'package:nusantara_food/screens/reset_password.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
@@ -50,14 +51,7 @@ class _LoginformState extends State<Loginform> {
                         builder: (context) => BottomNavadm(initialIndex: 0, userName: userName ?? ''),
                       ),
                     );
-                  } else if (role == 'user') {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BottomNav(initialIndex: 0, userName: userName ?? ''),
-                      ),
-                    );
-                  } else if (role == 'anonymous') {
+                  } else if (role == 'user' || role == 'anonymous') {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -98,6 +92,27 @@ class _LoginformState extends State<Loginform> {
     return user.emailVerified;
   }
 
+  Future<void> saveUserInfo(User user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userId', user.uid);
+    await prefs.setString('email', user.email ?? '');
+  }
+
+  Future<void> clearUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
+
+  Future<Map<String, String?>> getUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    String? email = prefs.getString('email');
+    return {
+      'userId': userId,
+      'email': email,
+    };
+  }
+
   void _login() async {
     setState(() {
       _emailError = '';
@@ -129,6 +144,7 @@ class _LoginformState extends State<Loginform> {
       );
 
       if (credential.user != null) {
+        await saveUserInfo(credential.user!);
         bool emailVerified = await isEmailVerified(credential.user!);
 
         if (!emailVerified) {
@@ -185,7 +201,8 @@ class _LoginformState extends State<Loginform> {
       final credential = await FirebaseAuth.instance.signInAnonymously();
 
       if (credential.user != null) {
-        // Create a Firestore entry for the anonymous user
+        await saveUserInfo(credential.user!);
+
         await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).set({
           'uid': credential.user!.uid,
           'role': 'anonymous',
@@ -263,16 +280,19 @@ class _LoginformState extends State<Loginform> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      hintText: 'Masukkan email Anda',
+                      hintStyle: textStyle(12, const Color(0xFFB2B2B2), FontWeight.w400),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(color: Color(0xFF035444)),
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
                       errorText: _emailError.isNotEmpty ? _emailError : null,
                     ),
+                    style: textStyle(14, const Color(0xFF000000), FontWeight.w400),
+                    keyboardType: TextInputType.emailAddress,
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 15),
                   Text(
                     'Password',
                     style: textStyle(15, const Color(0xFF035444), FontWeight.w800),
@@ -280,48 +300,64 @@ class _LoginformState extends State<Loginform> {
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: true,
                     decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      hintText: 'Masukkan password Anda',
+                      hintStyle: textStyle(12, const Color(0xFFB2B2B2), FontWeight.w400),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: const BorderSide(color: Color(0xFF035444)),
                       ),
-                      filled: true,
-                      fillColor: Colors.white,
                       errorText: _passwordError.isNotEmpty ? _passwordError : null,
                     ),
+                    style: textStyle(14, const Color(0xFF000000), FontWeight.w400),
+                    obscureText: true,
                   ),
-                  const SizedBox(height: 42),
-                  ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF035444),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                  const SizedBox(height: 24),
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF035444),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: Center(
                       child: Text(
-                        'Masuk',
-                        style: textStyle(16, const Color.fromARGB(255, 255, 255, 255), FontWeight.w800),
+                        'Login',
+                        style: textStyle(14, const Color(0xFFFFFFFF), FontWeight.w700),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: _navigateToResetPassword,
-                    child: Text(
-                      'Lupa Password?',
-                      style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _loginAnonymously,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        side: const BorderSide(color: Color(0xFF035444)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        'Login sebagai Tamu',
+                        style: textStyle(14, const Color(0xFF035444), FontWeight.w700),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: _loginAnonymously,
-                    child: Text(
-                      'Masuk sebagai Tamu',
-                      style: textStyle(14, const Color(0xFF035444), FontWeight.w600),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: GestureDetector(
+                      onTap: _navigateToResetPassword,
+                      child: Text(
+                        'Lupa Password?',
+                        style: textStyle(14, const Color(0xFF035444), FontWeight.w700),
+                      ),
                     ),
                   ),
                 ],

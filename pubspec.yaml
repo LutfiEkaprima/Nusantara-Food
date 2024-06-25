@@ -46,6 +46,9 @@ dependencies:
   provider: ^6.0.0
   firebase_app_check: ^0.2.2+7
   intl: ^0.19.0
+  flutter_secure_storage: ^7.0.0
+  shared_preferences: ^2.2.3
+  introduction_screen: ^3.0.2
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +61,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+  flutter_native_splash: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -108,3 +112,12 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icons/Icon.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
+
+flutter_native_splash:
+  color: "#42a5f5" # Warna background splash screen
+  image: assets/icons/Icon.png # Path ke gambar logo
+  android: true
+  ios: true
+  web: true
+  android_gravity: center
+  ios_content_mode: scaleAspectFit

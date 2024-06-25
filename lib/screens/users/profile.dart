@@ -7,6 +7,7 @@ import 'package:nusantara_food/screens/users/tambahresep.dart';
 import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -465,12 +466,18 @@ class SettingsPage extends StatelessWidget {
             title:
                 const Text('Keluar Akun', style: TextStyle(color: Colors.red)),
             onTap: () async {
+              await _clearUserInfo(); // Clear user information from shared preferences
               await FirebaseAuth.instance.signOut();
               Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
       ),
     );
+  }
+  Future<void> _clearUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all stored data
   }
 }
