@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> {
           routes: {
             '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),
             '/reset_password': (context) => const ResetPasswordPage(),
-            '/home': (context) => HomeScreen(),
+            '/home': (context) => const HomeScreen(),
             '/resep': (context) => const ResepScreen(),
             '/login': (context) => const LoginPage(),
             '/onboarding': (context) => OnboardingScreen(), // Route untuk onboarding screen

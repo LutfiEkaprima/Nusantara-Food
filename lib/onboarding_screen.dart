@@ -38,7 +38,7 @@ class OnboardingScreen extends StatelessWidget {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboardingComplete', true);
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => LoginPage()),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
     );
   }
 }

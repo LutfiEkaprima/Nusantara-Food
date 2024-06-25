@@ -19,16 +19,13 @@ class _SplashScreenState extends State<SplashScreen> {
     String? userId = prefs.getString('userId');
     bool? onboardingComplete = prefs.getBool('onboardingComplete');
 
-    await Future.delayed(Duration(seconds: 3)); // Simulasi durasi splash screen
+    await Future.delayed(const Duration(seconds: 3));
 
     if (userId != null) {
-      // User is logged in
       Navigator.of(context).pushReplacementNamed('/bottomnav');
     } else if (onboardingComplete ?? false) {
-      // User has completed onboarding
       Navigator.of(context).pushReplacementNamed('/login');
     } else {
-      // User has not completed onboarding
       Navigator.of(context).pushReplacementNamed('/onboarding');
     }
   }
@@ -36,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFED),
+      backgroundColor: const Color(0xFFFFFFED),
       body: Center(
         child: Image.asset('assets/icons/Icon.png', width: 150, height: 150),
       ),
