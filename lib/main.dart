@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nusantara_food/onboarding_screen.dart';
 import 'package:nusantara_food/splash_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:nusantara_food/providers/save_resep_provider.dart';
 import 'package:nusantara_food/screens/users/botnav.dart';
 import 'package:nusantara_food/screens/users/home_screen.dart';
 import 'package:nusantara_food/screens/users/resep.dart';
@@ -74,11 +72,7 @@ class _MyAppState extends State<MyApp> {
         ),
       );
     } else {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => SavedRecipesProvider()),
-        ],
-        child: MaterialApp(
+        return MaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'Montserrat',
@@ -93,8 +87,7 @@ class _MyAppState extends State<MyApp> {
             '/login': (context) => const LoginPage(),
             '/onboarding': (context) => OnboardingScreen(), // Route untuk onboarding screen
           },
-        ),
-      );
+        );
     }
   }
 }

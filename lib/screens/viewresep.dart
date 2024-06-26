@@ -105,6 +105,12 @@ class _ViewResepState extends State<ViewResep> {
 
   Future<void> submitComment() async {
     final user = FirebaseAuth.instance.currentUser;
+    if (_userData != null &&
+        _userData!.containsKey('status') &&
+        _userData!['status'] == 'guest') {
+      _showLoginPopup();
+      return;
+    }
     if (user != null && commentController.text.isNotEmpty) {
       final comment = {
         'text': commentController.text,
@@ -139,6 +145,12 @@ class _ViewResepState extends State<ViewResep> {
 
   Future<void> submitRating(double rating) async {
     final user = FirebaseAuth.instance.currentUser;
+    if (_userData != null &&
+        _userData!.containsKey('status') &&
+        _userData!['status'] == 'guest') {
+      _showLoginPopup();
+      return;
+    }
     if (user != null) {
       DocumentReference docRef =
           FirebaseFirestore.instance.collection('resep').doc(widget.docId);
@@ -160,7 +172,8 @@ class _ViewResepState extends State<ViewResep> {
           }
         });
 
-        double overallRating = (data['overallRating'] != null) ? data['overallRating'] : 0.0;
+        double overallRating =
+            (data['overallRating'] != null) ? data['overallRating'] : 0.0;
         overallRating = ratingCount > 0 ? totalRating / ratingCount : 0.0;
 
         await docRef.update({
@@ -176,6 +189,32 @@ class _ViewResepState extends State<ViewResep> {
         print('Error submitting rating: $e');
       }
     }
+  }
+
+  void _showLoginPopup() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Required'),
+          content: const Text('You need to login to perform this action.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/login');
+              },
+              child: const Text('Login'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -397,22 +436,27 @@ class _ViewResepState extends State<ViewResep> {
                 style: textStyle(16, Colors.black, FontWeight.bold),
               ),
               const SizedBox(height: 8.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < userRating ? Icons.star : Icons.star_border,
-                      color: Colors.yellow,
+              _userData != null &&
+                      _userData!.containsKey('status') &&
+                      _userData!['status'] == 'guest'
+                  ? Center(child: Text('Login to give rating'))
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return IconButton(
+                          icon: Icon(
+                            index < userRating ? Icons.star : Icons.star_border,
+                            color: Colors.yellow,
+                          ),
+                          onPressed: () {
+                            submitRating(index + 1.0);
+                          },
+                        );
+                      }),
                     ),
-                    onPressed: () {
-                      submitRating(index + 1.0);
-                    },
-                  );
-                }),
-              ),
               const SizedBox(height: 16.0),
-              Text('Komentar:', style: textStyle(18, Colors.black, FontWeight.bold)),
+              Text('Komentar:',
+                  style: textStyle(18, Colors.black, FontWeight.bold)),
               const SizedBox(height: 8.0),
               Container(
                 padding: const EdgeInsets.all(8.0),
@@ -422,16 +466,20 @@ class _ViewResepState extends State<ViewResep> {
                 ),
                 child: Column(
                   children: [
-                    TextField(
-                      controller: commentController,
-                      decoration: InputDecoration(
-                        labelText: 'Tulis komentar...',
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.send),
-                          onPressed: submitComment,
-                        ),
-                      ),
-                    ),
+                    _userData != null &&
+                            _userData!.containsKey('status') &&
+                            _userData!['status'] == 'guest'
+                        ? Center(child: Text('Login to comment'))
+                        : TextField(
+                            controller: commentController,
+                            decoration: InputDecoration(
+                              labelText: 'Tulis komentar...',
+                              suffixIcon: IconButton(
+                                icon: Icon(Icons.send),
+                                onPressed: submitComment,
+                              ),
+                            ),
+                          ),
                     const SizedBox(height: 16.0),
                     Column(
                       children: List.generate(
@@ -452,11 +500,13 @@ class _ViewResepState extends State<ViewResep> {
                                 const SizedBox(width: 8.0),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         comment['userName'],
-                                        style: textStyle(14, Colors.black, FontWeight.bold),
+                                        style: textStyle(
+                                            14, Colors.black, FontWeight.bold),
                                       ),
                                       const SizedBox(height: 4.0),
                                       Text(comment['text']),

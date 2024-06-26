@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:nusantara_food/providers/save_resep_provider.dart';
 import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/utils.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
-import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,8 +19,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> lunchRecipes = [];
   List<Map<String, dynamic>> dinnerRecipes = [];
   bool _isLoading = true;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String _userName = '';
+  User? _currentUser;
+  Set<String> savedRecipeIds = Set<String>();
 
   @override
   void initState() {
@@ -30,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchApprovedRecipes();
     _fetchUserName();
     _searchController.addListener(_searchRecipes);
+    _currentUser = FirebaseAuth.instance.currentUser;
+    _fetchSavedRecipes();
   }
 
   Future<void> _fetchUserName() async {
@@ -46,6 +48,23 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('Error fetching user name: $e');
+    }
+  }
+
+  Future<void> _fetchSavedRecipes() async {
+    try {
+      if (_currentUser != null) {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .collection('savedRecipes')
+            .get();
+        setState(() {
+          savedRecipeIds = snapshot.docs.map((doc) => doc.id).toSet();
+        });
+      }
+    } catch (e) {
+      print('Error fetching saved recipes: $e');
     }
   }
 
@@ -98,6 +117,42 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _saveRecipe(Map<String, dynamic> recipe) async {
+    try {
+      if (_currentUser != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .collection('savedRecipes')
+            .doc(recipe['docId'])
+            .set(recipe);
+        setState(() {
+          savedRecipeIds.add(recipe['docId']);
+        });
+      }
+    } catch (e) {
+      print('Error saving recipe: $e');
+    }
+  }
+
+  Future<void> _removeRecipe(String docId) async {
+    try {
+      if (_currentUser != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_currentUser!.uid)
+            .collection('savedRecipes')
+            .doc(docId)
+            .delete();
+        setState(() {
+          savedRecipeIds.remove(docId);
+        });
+      }
+    } catch (e) {
+      print('Error removing recipe: $e');
     }
   }
 
@@ -179,18 +234,30 @@ class _HomeScreenState extends State<HomeScreen> {
               Section(
                 title: 'MENU HARI INI',
                 recipes: filteredRecipes,
+                onSaveRecipe: _saveRecipe,
+                onRemoveRecipe: _removeRecipe,
+                savedRecipeIds: savedRecipeIds,
               ),
               Section(
                 title: 'MENU SARAPAN',
                 recipes: breakfastRecipes,
+                onSaveRecipe: _saveRecipe,
+                onRemoveRecipe: _removeRecipe,
+                savedRecipeIds: savedRecipeIds,
               ),
               Section(
                 title: 'MENU MAKAN SIANG',
                 recipes: lunchRecipes,
+                onSaveRecipe: _saveRecipe,
+                onRemoveRecipe: _removeRecipe,
+                savedRecipeIds: savedRecipeIds,
               ),
               Section(
                 title: 'MENU MAKAN MALAM',
                 recipes: dinnerRecipes,
+                onSaveRecipe: _saveRecipe,
+                onRemoveRecipe: _removeRecipe,
+                savedRecipeIds: savedRecipeIds,
               ),
             ],
           ),
@@ -203,8 +270,18 @@ class _HomeScreenState extends State<HomeScreen> {
 class Section extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> recipes;
+  final Function(Map<String, dynamic>) onSaveRecipe;
+  final Function(String) onRemoveRecipe;
+  final Set<String> savedRecipeIds;
 
-  const Section({super.key, required this.title, required this.recipes});
+  const Section({
+    super.key,
+    required this.title,
+    required this.recipes,
+    required this.onSaveRecipe,
+    required this.onRemoveRecipe,
+    required this.savedRecipeIds,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +313,8 @@ class Section extends StatelessWidget {
                 final truncatedPublisherName = publisherName.length > 15
                     ? publisherName.substring(0, 15) + '...'
                     : publisherName;
+
+                bool isSaved = savedRecipeIds.contains(recipe['docId']);
 
                 return GestureDetector(
                   onTap: () {
@@ -304,25 +383,21 @@ class Section extends StatelessWidget {
                                           FontWeight.normal),
                                     ),
                                     const Spacer(),
-                                    Consumer<SavedRecipesProvider>(
-                                      builder: (context, savedRecipesProvider,
-                                          child) {
-                                        bool isSaved = savedRecipesProvider
-                                            .isSaved(recipe['docId']);
-                                        return IconButton(
-                                          icon: Icon(
-                                            isSaved
-                                                ? Icons.bookmark
-                                                : Icons.bookmark_border,
-                                            color: isSaved
-                                                ? Colors.yellow
-                                                : Colors.black54,
-                                          ),
-                                          onPressed: () {
-                                            savedRecipesProvider
-                                                .toggleRecipe(recipe);
-                                          },
-                                        );
+                                    IconButton(
+                                      icon: Icon(
+                                        isSaved
+                                            ? Icons.bookmark
+                                            : Icons.bookmark_border,
+                                        color: isSaved
+                                            ? Colors.yellow
+                                            : Colors.black54,
+                                      ),
+                                      onPressed: () {
+                                        if (isSaved) {
+                                          onRemoveRecipe(recipe['docId']);
+                                        } else {
+                                          onSaveRecipe(recipe);
+                                        }
                                       },
                                     ),
                                   ],

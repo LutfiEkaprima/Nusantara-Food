@@ -28,7 +28,7 @@ class _BottomNavStateadm extends State<BottomNavadm> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> screens = [
-      HomeScreenadm(userName: widget.userName),
+      const HomeScreenadm(),
       const KreasikuScreenadm(),
       const ResepScreenadm(),
       const ProfileScreenadm(),
