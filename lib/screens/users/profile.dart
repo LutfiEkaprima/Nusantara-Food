@@ -37,15 +37,15 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
       if (_userData?.containsKey('status') == true && _userData?['status'] == 'guest') {
         _tabs = [
-          Tab(text: 'About'),
+          const Tab(text: 'About'),
         ];
         _tabViews = [
           AboutTab(userData: _userData),
         ];
       } else {
         _tabs = [
-          Tab(text: 'About'),
-          Tab(text: 'Resep Saya'),
+          const Tab(text: 'About'),
+          const Tab(text: 'Resep Saya'),
         ];
         _tabViews = [
           AboutTab(userData: _userData),
@@ -129,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
           body: LoadingState(
             isLoading: _isLoading,
             child: _tabController == null
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : TabBarView(
                     controller: _tabController,
                     children: _tabViews,
