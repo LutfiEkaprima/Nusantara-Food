@@ -97,7 +97,6 @@ class _TambahResepState extends State<TambahResep> {
         Timestamp timestamp = draft['createdAt'] as Timestamp;
         DateTime createdAt = timestamp.toDate();
         String formattedDate = DateFormat('yyyy-MM-dd').format(createdAt);
-        print("Draft created at: $formattedDate");
       }
     });
   }
@@ -125,7 +124,7 @@ class _TambahResepState extends State<TambahResep> {
       String? publisherName = await getUserName(user.uid);
       if (publisherName == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nama pengguna tidak ditemukan.')),
+          const SnackBar(content: Text('Nama pengguna tidak ditemukan.')),
         );
         return;
       }

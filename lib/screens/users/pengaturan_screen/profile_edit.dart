@@ -78,7 +78,7 @@ class _ProfileEditState extends State<ProfileEdit> {
         _isLoading = false;
       });
 
-      Navigator.pop(context, true); // Kembali ke ProfileScreen dan mengirim true sebagai indikator
+      Navigator.pop(context, true);
     }
   }
 
@@ -91,7 +91,7 @@ class _ProfileEditState extends State<ProfileEdit> {
         title: const Text('Edit Profil'),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(

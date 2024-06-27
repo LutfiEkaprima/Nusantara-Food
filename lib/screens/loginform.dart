@@ -227,7 +227,7 @@ class _LoginformState extends State<Loginform> {
   void _navigateToResetPassword() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+      MaterialPageRoute(builder: (context) => const ResetPasswordPage()),
     );
   }
 
@@ -315,7 +315,7 @@ class _LoginformState extends State<Loginform> {
                     obscureText: true,
                   ),
                   const SizedBox(height: 24),
-                  Container(
+                  SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _login,
@@ -333,7 +333,7 @@ class _LoginformState extends State<Loginform> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Container(
+                  SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _loginAnonymously,

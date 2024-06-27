@@ -135,10 +135,9 @@ class _ViewResepState extends State<ViewResep> {
             'timestamp': Timestamp.now(),
           });
           commentController.clear();
-          print(_userData?['nama']);
         });
       } catch (e) {
-        print('Error submitting comment: $e');
+        // ignore: avoid_print
       }
     }
   }
@@ -186,7 +185,7 @@ class _ViewResepState extends State<ViewResep> {
           averageRating = overallRating;
         });
       } catch (e) {
-        print('Error submitting rating: $e');
+        // ignore: avoid_print
       }
     }
   }
@@ -359,15 +358,37 @@ class _ViewResepState extends State<ViewResep> {
                 'Bahan Memasak',
                 style: textStyle(16, Colors.black, FontWeight.bold),
               ),
-              const SizedBox(height: 4.0),
-              Text(data['ingredients'].join('\n')),
+              const SizedBox(height: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: data['ingredients'].map<Widget>((ingredient) {
+                  return Row(
+                    children: [
+                      const Icon(Icons.circle, size: 8.0),
+                      const SizedBox(width: 8.0),
+                      Expanded(child: Text(ingredient)),
+                    ],
+                  );
+                }).toList(),
+              ),
               const SizedBox(height: 16.0),
               Text(
                 'Peralatan Memasak',
                 style: textStyle(16, Colors.black, FontWeight.bold),
               ),
-              const SizedBox(height: 4.0),
-              Text(data['tools'].join('\n')),
+              const SizedBox(height: 10.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: data['tools'].map<Widget>((tool) {
+                  return Row(
+                    children: [
+                      const Icon(Icons.circle, size: 4.0), 
+                      const SizedBox(width: 8.0),
+                      Expanded(child: Text(tool)),
+                    ],
+                  );
+                }).toList(),
+              ),
               const SizedBox(height: 16.0),
               Text(
                 'Cara Memasak Resep',
@@ -439,7 +460,7 @@ class _ViewResepState extends State<ViewResep> {
               _userData != null &&
                       _userData!.containsKey('status') &&
                       _userData!['status'] == 'guest'
-                  ? Center(child: Text('Login to give rating'))
+                  ? const Center(child: Text('Login Untuk Memberikan Rating'))
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(5, (index) {
@@ -469,13 +490,13 @@ class _ViewResepState extends State<ViewResep> {
                     _userData != null &&
                             _userData!.containsKey('status') &&
                             _userData!['status'] == 'guest'
-                        ? Center(child: Text('Login to comment'))
+                        ? const Center(child: Text('Login Untuk Melakukan Komentar'))
                         : TextField(
                             controller: commentController,
                             decoration: InputDecoration(
                               labelText: 'Tulis komentar...',
                               suffixIcon: IconButton(
-                                icon: Icon(Icons.send),
+                                icon: const Icon(Icons.send),
                                 onPressed: submitComment,
                               ),
                             ),
@@ -491,7 +512,7 @@ class _ViewResepState extends State<ViewResep> {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 20,
                                   backgroundImage: NetworkImage(
                                     'https://firebasestorage.googleapis.com/v0/b/nusatara-food.appspot.com/o/default_image%2FIcon.png?alt=media&token=b74c7a3e-950f-402a-9deb-07a0d062be82',

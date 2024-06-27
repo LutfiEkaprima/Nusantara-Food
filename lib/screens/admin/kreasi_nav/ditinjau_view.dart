@@ -5,7 +5,7 @@ import 'package:nusantara_food/screens/viewresep.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DitinjauView extends StatefulWidget {
-  DitinjauView({super.key});
+  const DitinjauView({super.key});
 
   @override
   _DitinjauViewState createState() => _DitinjauViewState();
@@ -42,7 +42,7 @@ class _DitinjauViewState extends State<DitinjauView> {
     try {
       await _fetchDitinjau();
     } catch (error) {
-      print('Error fetching ditinjau recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {
@@ -60,7 +60,7 @@ class _DitinjauViewState extends State<DitinjauView> {
         await _firestore.collection('resep').doc(docId).update({'status': status});
       }
     } catch (error) {
-      print('Error updating recipe status: $error');
+      // ignore: avoid_print
     }
   }
 
@@ -98,7 +98,7 @@ class _DitinjauViewState extends State<DitinjauView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tidak'),
+              child: const Text('Tidak'),
             ),
             TextButton(
               onPressed: () {
@@ -106,7 +106,7 @@ class _DitinjauViewState extends State<DitinjauView> {
                 Navigator.of(context).pop();
                 _fetchData();
               },
-              child: Text('Ya'),
+              child: const Text('Ya'),
             ),
           ],
         );
@@ -145,7 +145,7 @@ class _DitinjauViewState extends State<DitinjauView> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.circle, color: Colors.yellow, size: 12),
+                      const Icon(Icons.circle, color: Colors.yellow, size: 12),
                       PopupMenuButton<String>(
                         onSelected: (value) {
                           _showActionDialog(documents[index].id, value);

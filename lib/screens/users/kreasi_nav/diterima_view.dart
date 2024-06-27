@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DiterimaView extends StatefulWidget {
-  DiterimaView({super.key});
+  const DiterimaView({super.key});
 
   @override
   _DiterimaViewState createState() => _DiterimaViewState();
@@ -42,7 +42,7 @@ class _DiterimaViewState extends State<DiterimaView> {
     try {
       await _fetchDiterima();
     } catch (error) {
-      print('Error fetching diterima recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {
@@ -54,7 +54,7 @@ class _DiterimaViewState extends State<DiterimaView> {
     try {
       await _firestore.collection('resep').doc(docId).delete();
     } catch (error) {
-      print('Error deleting recipe: $error');
+      // ignore: avoid_print
     }
   }
 
@@ -63,12 +63,12 @@ class _DiterimaViewState extends State<DiterimaView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Hapus Resep'),
-          content: Text('Apakah Anda yakin ingin menghapus resep ini?'),
+          title: const Text('Hapus Resep'),
+          content: const Text('Apakah Anda yakin ingin menghapus resep ini?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tidak'),
+              child: const Text('Tidak'),
             ),
             TextButton(
               onPressed: () {
@@ -76,7 +76,7 @@ class _DiterimaViewState extends State<DiterimaView> {
                 Navigator.of(context).pop();
                 _fetchData();
               },
-              child: Text('Ya'),
+              child: const Text('Ya'),
             ),
           ],
         );
@@ -94,7 +94,7 @@ class _DiterimaViewState extends State<DiterimaView> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return LoadingState(
               isLoading: true,
-              child: Container(), // Empty container to show loading animation
+              child: Container(),
             );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -115,7 +115,7 @@ class _DiterimaViewState extends State<DiterimaView> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.circle, color: Colors.green, size: 12),
+                      const Icon(Icons.circle, color: Colors.green, size: 12),
                       PopupMenuButton<String>(
                         onSelected: (value) {
                           if (value == 'Hapus Resep') {
@@ -135,7 +135,6 @@ class _DiterimaViewState extends State<DiterimaView> {
                     ],
                   ),
                   onTap: () {
-                    // Navigate to detail page if needed
                   },
                 );
               },

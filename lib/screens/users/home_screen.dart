@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _userName = '';
   User? _currentUser;
-  Set<String> savedRecipeIds = Set<String>();
+  Set<String> savedRecipeIds = <String>{};
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching user name: $e');
+      // ignore: avoid_print
     }
   }
 
@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching saved recipes: $e');
+      // ignore: avoid_print
     }
   }
 
@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
     } catch (e) {
-      print('Error fetching approved recipes: $e');
+      // ignore: avoid_print
     } finally {
       setState(() {
         _isLoading = false;
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print('Error saving recipe: $e');
+      // ignore: avoid_print
     }
   }
 
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print('Error removing recipe: $e');
+      // ignore: avoid_print
     }
   }
 

@@ -198,7 +198,7 @@ class _ResepSayaTabState extends State<ResepSayaTab> {
         });
       }
     } catch (e) {
-      print('Error fetching user recipes: $e');
+      // ignore: avoid_print
     } finally {
       setState(() {
         _isLoading = false;
@@ -318,7 +318,6 @@ class SettingsPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (context) => const ProfileEdit()),
               );
-
               Navigator.pop(context, result);
             },
           ),
@@ -478,6 +477,6 @@ class SettingsPage extends StatelessWidget {
   }
   Future<void> _clearUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear all stored data
+    await prefs.clear();
   }
 }

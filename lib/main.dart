@@ -78,14 +78,14 @@ class _MyAppState extends State<MyApp> {
             fontFamily: 'Montserrat',
             textTheme: GoogleFonts.montserratTextTheme()
           ),
-          home: SplashScreen(), // Ganti dengan SplashScreen
+          home: const SplashScreen(),
           routes: {
             '/bottomnav': (context) => const BottomNav(initialIndex: 0, userName: ''),
             '/reset_password': (context) => const ResetPasswordPage(),
             '/home': (context) => const HomeScreen(),
             '/resep': (context) => const ResepScreen(),
             '/login': (context) => const LoginPage(),
-            '/onboarding': (context) => OnboardingScreen(), // Route untuk onboarding screen
+            '/onboarding': (context) => const OnboardingScreen(),
           },
         );
     }

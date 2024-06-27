@@ -35,13 +35,13 @@ class _ResepScreenState extends State<ResepScreen> {
             var data = doc.data() as Map<String, dynamic>;
             data['docId'] = doc.id;
             data['isSaved'] =
-                true; // Set isSaved to true since it's from savedRecipes
+                true;
             return data;
           }).toList();
         });
       }
     } catch (e) {
-      print('Error fetching saved recipes: $e');
+      // ignore: avoid_print
     } finally {
       setState(() {
         _isLoading = false;
@@ -137,7 +137,7 @@ class RecipeCard extends StatelessWidget {
   final Map<String, dynamic> recipe;
   final VoidCallback onToggleSave;
 
-  RecipeCard({required this.recipe, required this.onToggleSave});
+  const RecipeCard({super.key, required this.recipe, required this.onToggleSave});
 
   @override
   Widget build(BuildContext context) {

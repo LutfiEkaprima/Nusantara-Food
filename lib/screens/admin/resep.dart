@@ -39,7 +39,7 @@ class _ResepScreenadmState extends State<ResepScreenadm> {
         });
       }
     } catch (e) {
-      print('Error fetching saved recipes: $e');
+      // ignore: avoid_print
     } finally {
       setState(() {
         _isLoading = false;
@@ -131,7 +131,7 @@ class RecipeCard extends StatelessWidget {
   final Map<String, dynamic> recipe;
   final VoidCallback onToggleSave;
 
-  RecipeCard({required this.recipe, required this.onToggleSave});
+  const RecipeCard({super.key, required this.recipe, required this.onToggleSave});
 
   @override
   Widget build(BuildContext context) {

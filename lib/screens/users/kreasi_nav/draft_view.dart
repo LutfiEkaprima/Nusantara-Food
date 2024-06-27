@@ -5,7 +5,7 @@ import 'package:nusantara_food/screens/users/tambahresep.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DraftView extends StatefulWidget {
-  DraftView({super.key});
+  const DraftView({super.key});
 
   @override
   _DraftViewState createState() => _DraftViewState();
@@ -43,7 +43,7 @@ class _DraftViewState extends State<DraftView> {
     try {
       await _fetchDrafts();
     } catch (error) {
-      print('Error fetching Drafts recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {

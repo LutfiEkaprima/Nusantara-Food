@@ -4,6 +4,8 @@ import 'package:nusantara_food/screens/loginmenu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatelessWidget {
+  const OnboardingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return IntroductionScreen(

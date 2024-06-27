@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DiterimaView extends StatefulWidget {
-  DiterimaView({super.key});
+  const DiterimaView({super.key});
 
   @override
   _DiterimaViewState createState() => _DiterimaViewState();
@@ -41,7 +41,7 @@ class _DiterimaViewState extends State<DiterimaView> {
     try {
       await _fetchDiterima();
     } catch (error) {
-      print('Error fetching diterima recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {
@@ -53,7 +53,7 @@ class _DiterimaViewState extends State<DiterimaView> {
     try {
       await _firestore.collection('resep').doc(docId).delete();
     } catch (error) {
-      print('Error deleting recipe: $error');
+      // ignore: avoid_print
     }
   }
 
@@ -134,7 +134,6 @@ class _DiterimaViewState extends State<DiterimaView> {
                     ],
                   ),
                   onTap: () {
-                    // Navigate to detail page if needed
                   },
                 );
               },

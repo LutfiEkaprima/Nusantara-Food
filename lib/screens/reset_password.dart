@@ -25,9 +25,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         content: Text('Password reset email sent.'),
         backgroundColor: Colors.green,
       ));
-      Navigator.pop(context); // Kembali ke halaman login
+      Navigator.pop(context);
     } catch (e) {
-      print('Failed to send password reset email: $e');
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Failed to send password reset email.'),
         backgroundColor: Colors.red,

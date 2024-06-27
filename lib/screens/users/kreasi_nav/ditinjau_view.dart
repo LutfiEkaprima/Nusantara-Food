@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DitinjauView extends StatefulWidget {
-  DitinjauView({super.key});
+  const DitinjauView({super.key});
 
   @override
   _DitinjauViewState createState() => _DitinjauViewState();
@@ -42,7 +42,7 @@ class _DitinjauViewState extends State<DitinjauView> {
     try {
       await _fetchDitinjau();
     } catch (error) {
-      print('Error fetching ditinjau recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {
@@ -54,7 +54,7 @@ class _DitinjauViewState extends State<DitinjauView> {
     try {
       await _firestore.collection('resep').doc(docId).update({'status': 'batal'});
     } catch (error) {
-      print('Error cancelling submission: $error');
+      // ignore: avoid_print
     }
   }
 
@@ -63,12 +63,12 @@ class _DitinjauViewState extends State<DitinjauView> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Batalkan Pengajuan'),
-          content: Text('Apakah Anda yakin ingin membatalkan pengajuan ini?'),
+          title: const Text('Batalkan Pengajuan'),
+          content: const Text('Apakah Anda yakin ingin membatalkan pengajuan ini?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tidak'),
+              child: const Text('Tidak'),
             ),
             TextButton(
               onPressed: () {
@@ -76,7 +76,7 @@ class _DitinjauViewState extends State<DitinjauView> {
                 Navigator.of(context).pop();
                 _fetchData();
               },
-              child: Text('Ya'),
+              child: const Text('Ya'),
             ),
           ],
         );
@@ -115,7 +115,7 @@ class _DitinjauViewState extends State<DitinjauView> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.circle, color: Colors.yellow, size: 12),
+                      const Icon(Icons.circle, color: Colors.yellow, size: 12),
                       PopupMenuButton<String>(
                         onSelected: (value) {
                           if (value == 'Batalkan Pengajuan') {

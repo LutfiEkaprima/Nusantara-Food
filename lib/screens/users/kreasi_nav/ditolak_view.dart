@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusantara_food/widgets/loadingstate.dart';
 
 class DitolakView extends StatefulWidget {
-  DitolakView({super.key});
+  const DitolakView({super.key});
 
   @override
   _DitolakViewState createState() => _DitolakViewState();
@@ -42,7 +42,7 @@ class _DitolakViewState extends State<DitolakView> {
     try {
       await _fetchDitolak();
     } catch (error) {
-      print('Error fetching Ditolak recipes: $error');
+      // ignore: avoid_print
     }
 
     setState(() {
@@ -78,9 +78,8 @@ class _DitolakViewState extends State<DitolakView> {
                 return ListTile(
                   title: Text(data['title'], style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   subtitle: Text(data['time' ]+ ' Menit', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w200)),
-                  trailing: Icon(Icons.circle, color: Colors.red, size: 12),
+                  trailing: const Icon(Icons.circle, color: Colors.red, size: 12),
                   onTap: () {
-                    // Navigate to detail page if needed
                   },
                 );
               },

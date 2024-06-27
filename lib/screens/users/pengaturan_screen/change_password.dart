@@ -39,7 +39,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           );
         }
 
-        // Re-authenticate user with old password
         AuthCredential credential = EmailAuthProvider.credential(
           email: email,
           password: _oldPasswordController.text,
@@ -47,16 +46,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
         await user.reauthenticateWithCredential(credential);
 
-        // Update password
         if (_newPasswordController.text == _confirmPasswordController.text) {
           await user.updatePassword(_newPasswordController.text);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Password berhasil diubah.')),
+            const SnackBar(content: Text('Password berhasil diubah.')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Password baru tidak cocok.')),
+            const SnackBar(content: Text('Password baru tidak cocok.')),
           );
         }
       } on FirebaseAuthException catch (e) {
@@ -77,7 +75,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       backgroundColor: const Color(0xFFFFFFED),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFFED),
-        title: Text('Ganti Password')
+        title: const Text('Ganti Password')
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -87,7 +85,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             children: [
               TextFormField(
                 controller: _oldPasswordController,
-                decoration: InputDecoration(labelText: 'Password Lama'),
+                decoration: const InputDecoration(labelText: 'Password Lama'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -98,7 +96,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
               TextFormField(
                 controller: _newPasswordController,
-                decoration: InputDecoration(labelText: 'Password Baru'),
+                decoration: const InputDecoration(labelText: 'Password Baru'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -109,7 +107,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(labelText: 'Konfirmasi Password Baru'),
+                decoration: const InputDecoration(labelText: 'Konfirmasi Password Baru'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -121,12 +119,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _isLoading
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _changePassword,
-                      child: Text('Ganti Password'),
+                      child: const Text('Ganti Password'),
                     ),
             ],
           ),
