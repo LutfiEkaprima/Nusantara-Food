@@ -16,16 +16,16 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
+  TabController? _tabController;
   Map<String, dynamic>? _userData;
   bool _isLoading = true;
+  List<Widget> _tabs = [];
+  List<Widget> _tabViews = [];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _fetchUserData();
   }
 
@@ -34,6 +34,25 @@ class _ProfileScreenState extends State<ProfileScreen>
     setState(() {
       _userData = data;
       _isLoading = false;
+
+      if (_userData?.containsKey('status') == true && _userData?['status'] == 'guest') {
+        _tabs = [
+          Tab(text: 'About'),
+        ];
+        _tabViews = [
+          AboutTab(userData: _userData),
+        ];
+      } else {
+        _tabs = [
+          Tab(text: 'About'),
+          Tab(text: 'Resep Saya'),
+        ];
+        _tabViews = [
+          AboutTab(userData: _userData),
+          const ResepSayaTab(),
+        ];
+      }
+      _tabController = TabController(length: _tabs.length, vsync: this);
     });
   }
 
@@ -51,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
@@ -73,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SettingsPage()),
+                          builder: (context) => SettingsPage(userData: _userData)),
                     );
                     if (result == true) {
                       _fetchUserData();
@@ -97,30 +116,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                     style: textStyle(20, Colors.black, FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
-                  TabBar(
-                    controller: _tabController,
-                    labelStyle: textStyle(14, Colors.black, FontWeight.w600),
-                    tabs: const [
-                      Tab(text: 'About'),
-                      Tab(text: 'Resep Saya'),
-                    ],
-                  ),
+                  if (_tabController != null)
+                    TabBar(
+                      controller: _tabController,
+                      labelStyle: textStyle(14, Colors.black, FontWeight.w600),
+                      tabs: _tabs,
+                    ),
                 ],
               ),
             ),
           ),
           body: LoadingState(
             isLoading: _isLoading,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                AboutTab(userData: _userData),
-                const ResepSayaTab(),
-              ],
-            ),
+            child: _tabController == null
+                ? Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    controller: _tabController,
+                    children: _tabViews,
+                  ),
           ),
-        )
-      );
+        ));
   }
 }
 
@@ -288,7 +303,9 @@ class _ResepSayaTabState extends State<ResepSayaTab> {
 }
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.userData});
+
+  final Map<String, dynamic>? userData;
 
   @override
   Widget build(BuildContext context) {
@@ -321,20 +338,21 @@ class SettingsPage extends StatelessWidget {
               Navigator.pop(context, result);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: Text(
-              'Ubah Password',
-              style: textStyle(16, Colors.black, FontWeight.w500),
+          if (userData?['status'] != 'guest')
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: Text(
+                'Ubah Password',
+                style: textStyle(16, Colors.black, FontWeight.w500),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ChangePasswordScreen()),
+                );
+              },
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ChangePasswordScreen()),
-              );
-            },
-          ),
           const Divider(),
           const ListTile(
             title: Text('Info Lainnya',
