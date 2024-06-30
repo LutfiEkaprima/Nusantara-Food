@@ -13,6 +13,7 @@ import 'package:nusantara_food/screens/reset_password.dart';
 import 'package:nusantara_food/firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  
   await Firebase.initializeApp();
 }
 

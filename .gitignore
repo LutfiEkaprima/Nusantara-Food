@@ -32,7 +32,6 @@ migrate_working_dir/
 .pub/
 /build/
 firebase.json
-/android/app/src/google-services.json
 /lib/firebase_options.dart
 
 
@@ -46,3 +45,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+android/app/google-services.json
